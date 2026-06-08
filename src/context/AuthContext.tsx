@@ -25,6 +25,13 @@ export interface UserProfile {
   gender: string;
   photoURL: string | null;
   createdAt: number;
+  // New fields for backup email and 2FA
+  backupEmail?: string;
+  backupEmailVerified?: boolean;
+  twoFactorEnabled?: boolean;
+  twoFactorSecret?: string;
+  backupCodes?: string[];
+  backupCodesUsed?: string[];
 }
 
 interface AuthContextType {
