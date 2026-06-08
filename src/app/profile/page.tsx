@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Container, Box, Typography, Paper, Button, Avatar, CircularProgress,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, TextField, MenuItem
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, MenuItem,
+  Switch, FormControlLabel, Alert
 } from '@mui/material';
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -16,12 +17,14 @@ import { useRouter } from 'next/navigation';
 
 import { auth, db } from '@/config/firebase';
 import { updateProfile, deleteUser } from 'firebase/auth';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { useAuth } from '@/context/AuthContext';
+import BackupEmailSection from '@/components/BackupEmailSection';
+import TwoFactorSection from '@/components/TwoFactorSection';
+import { useAuth, UserProfile } from '@/context/AuthContext';
 
 function ProfileDashboard() {
   const { user, profile, logout } = useAuth();
@@ -29,24 +32,33 @@ function ProfileDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const [deleting, setDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editData, setEditData] = useState<any>({});
+  const [editData, setEditData] = useState<Partial<UserProfile>>({});
 
-  // --- OTP Flow State ---
+  // --- OTP Flow State for general actions ---
   const [otpAction, setOtpAction] = useState<'save' | 'delete' | 'avatar' | 'delete-avatar' | null>(null);
   const [otpCode, setOtpCode] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
+  const refreshProfile = useCallback(() => {
+    // Note: router.refresh() does not work in client components within App Router
+    // A full page reload or re-fetching data manually would be needed.
+    // For simplicity and given the scope, we'll rely on the AuthProvider refetching on auth state change
+    // or trigger manual update by setting profile state if that was an option.
+    // Since we don't directly manipulate profile state here, a refresh is the closest.
+    window.location.reload(); // Hard refresh to ensure AuthContext reloads profile
+  }, []);
+
   const triggerOtp = async (action: 'save' | 'delete' | 'avatar' | 'delete-avatar', file?: File) => {
     if (!user || !user.email) return;
-    setError('');
-    setSuccess('');
+    setError(null);
+    setSuccess(null);
     
     if (action === 'avatar' && file) {
       setPendingAvatarFile(file);
@@ -63,8 +75,8 @@ function ProfileDashboard() {
       if (!res.ok) throw new Error(data.error);
 
       setOtpAction(action);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to send OTP.');
     } finally {
       setOtpLoading(false);
     }
@@ -73,7 +85,7 @@ function ProfileDashboard() {
   const handleVerifyOtp = async () => {
     if (!user || !user.email) return;
     setOtpLoading(true);
-    setError('');
+    setError(null);
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
@@ -96,8 +108,9 @@ function ProfileDashboard() {
       
       setOtpAction(null);
       setOtpCode('');
-    } catch (err: any) {
-      setError(err.message || 'Invalid OTP.');
+      refreshProfile(); // Refresh profile after OTP-verified actions
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Invalid OTP.');
     } finally {
       setOtpLoading(false);
     }
@@ -158,7 +171,6 @@ function ProfileDashboard() {
     if (!user) return;
     setUploading(true);
     try {
-      // Remove photo URL from Firebase Auth and Firestore
       await updateProfile(user, { photoURL: null });
       await updateDoc(doc(db, 'users', user.uid), { photoURL: null });
       setSuccess("Profile picture removed successfully!");
@@ -177,11 +189,11 @@ function ProfileDashboard() {
       await deleteDoc(doc(db, 'users', user.uid));
       await deleteUser(user);
       router.push('/');
-    } catch (err: any) {
-      if (err.code === 'auth/requires-recent-login') {
+    } catch (err: unknown) {
+      if (err instanceof Error && 'code' in err && (err as { code: string }).code === 'auth/requires-recent-login') {
         setError("Firebase Security: Please log out and log back in to delete your account.");
       } else {
-        setError(err.message || "Failed to delete account.");
+        setError(err instanceof Error ? err.message : "Failed to delete account.");
       }
     } finally {
       setDeleting(false);
@@ -202,10 +214,10 @@ function ProfileDashboard() {
       });
     }
     setIsEditing(!isEditing);
-    setError(''); setSuccess('');
+    setError(null); setSuccess(null);
   };
 
-  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
 
@@ -219,8 +231,9 @@ function ProfileDashboard() {
       }
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
-    } catch (err: any) {
-      setError(err.message || "Failed to save profile.");
+      refreshProfile();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to save profile.");
     } finally {
       setSaving(false);
     }
@@ -236,8 +249,8 @@ function ProfileDashboard() {
           My Profile Dashboard
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 3 }}>{success}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 3 }} onClose={() => setSuccess(null)}>{success}</Alert>}
 
         <Paper elevation={0} sx={{ p: 4, borderRadius: 4, mb: 4, border: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 4 }}>
           <Box sx={{ position: 'relative' }}>
@@ -280,19 +293,19 @@ function ProfileDashboard() {
           
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Basic Information</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Full Name</Typography>
               {isEditing ? <TextField fullWidth size="small" name="fullName" value={editData.fullName} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.fullName}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Phone Number</Typography>
               {isEditing ? <TextField fullWidth size="small" name="phone" value={editData.phone} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.phone || 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Age</Typography>
               {isEditing ? <TextField fullWidth size="small" name="age" type="number" value={editData.age} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.age || 'N/A'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Gender</Typography>
               {isEditing ? (
                 <TextField select fullWidth size="small" name="gender" value={editData.gender} onChange={handleEditChange}>
@@ -303,7 +316,7 @@ function ProfileDashboard() {
                 </TextField>
               ) : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.gender || 'N/A'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12 }}>
+            <Grid item xs={12}>
               <Typography variant="caption" color="text.secondary">Bio</Typography>
               {isEditing ? <TextField fullWidth multiline rows={3} name="bio" value={editData.bio} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.bio || 'Not provided'}</Typography>}
             </Grid>
@@ -311,15 +324,15 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Professional Information</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">Company</Typography>
               {isEditing ? <TextField fullWidth size="small" name="company" value={editData.company} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.company || 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">Job Title</Typography>
               {isEditing ? <TextField fullWidth size="small" name="jobTitle" value={editData.jobTitle} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.jobTitle || 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">Expertise Area</Typography>
               {isEditing ? <TextField fullWidth size="small" name="expertiseArea" value={editData.expertiseArea} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.expertiseArea || 'Not provided'}</Typography>}
             </Grid>
@@ -327,19 +340,19 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Location</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Address</Typography>
               {isEditing ? <TextField fullWidth size="small" name="address" value={editData.address} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.address || 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">City</Typography>
               {isEditing ? <TextField fullWidth size="small" name="city" value={editData.city} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.city || 'N/A'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Country</Typography>
               {isEditing ? <TextField fullWidth size="small" name="country" value={editData.country} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.country || 'N/A'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
+            <Grid item xs={12} sm={6}>
               <Typography variant="caption" color="text.secondary">Postal Code</Typography>
               {isEditing ? <TextField fullWidth size="small" name="postalCode" value={editData.postalCode} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.postalCode || 'N/A'}</Typography>}
             </Grid>
@@ -347,20 +360,40 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Social Links</Typography>
           <Grid container spacing={3}>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">GitHub</Typography>
               {isEditing ? <TextField fullWidth size="small" name="githubUrl" type="url" value={editData.githubUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.githubUrl ? <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.githubUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">LinkedIn</Typography>
               {isEditing ? <TextField fullWidth size="small" name="linkedinUrl" type="url" value={editData.linkedinUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.linkedinUrl ? <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.linkedinUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
+            <Grid item xs={12} sm={4}>
               <Typography variant="caption" color="text.secondary">Twitter</Typography>
               {isEditing ? <TextField fullWidth size="small" name="twitterUrl" type="url" value={editData.twitterUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.twitterUrl ? <a href={profile.twitterUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.twitterUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
           </Grid>
         </Paper>
+
+        {/* Backup Email Section */}
+        {user && profile && (
+          <BackupEmailSection
+            currentBackupEmail={profile.backupEmail}
+            isVerified={profile.backupEmailVerified}
+            userEmail={user.email || ''}
+            onSuccess={refreshProfile}
+          />
+        )}
+
+        {/* Two-Factor Authentication Section */}
+        {user && profile && (
+          <TwoFactorSection
+            userId={user.uid}
+            userEmail={user.email || ''}
+            isEnabled={profile.twoFactorEnabled}
+            onSuccess={refreshProfile}
+          />
+        )}
 
         <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid', borderColor: 'error.main', bgcolor: 'rgba(211, 47, 47, 0.03)' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, color: 'error.main' }}>
@@ -378,18 +411,29 @@ function ProfileDashboard() {
       </Container>
       <Footer />
 
-      {/* Shared OTP Modal */}
+      {/* Shared OTP Modal for General Actions */}
       <Dialog open={!!otpAction} onClose={() => !otpLoading && setOtpAction(null)}>
         <DialogTitle sx={{ fontWeight: 700 }}>Security Verification</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
             To authorize this action, please enter the 6-digit OTP we just sent to <strong>{user.email}</strong>.
           </DialogContentText>
-          <TextField autoFocus fullWidth label="6-Digit OTP" variant="outlined" value={otpCode} onChange={(e) => setOtpCode(e.target.value)} disabled={otpLoading} />
+          <TextField
+            autoFocus
+            fullWidth
+            label="6-Digit OTP"
+            variant="outlined"
+            value={otpCode}
+            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            disabled={otpLoading}
+            InputProps={{
+              inputProps: { style: { textAlign: 'center', fontSize: '24px', letterSpacing: '8px' } }
+            }}
+          />
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 0 }}>
           <Button onClick={() => setOtpAction(null)} disabled={otpLoading} color="inherit">Cancel</Button>
-          <Button onClick={handleVerifyOtp} variant="contained" disabled={otpLoading || otpCode.length < 5}>
+          <Button onClick={handleVerifyOtp} variant="contained" disabled={otpLoading || otpCode.length !== 6}>
             {otpLoading ? <CircularProgress size={24} color="inherit" /> : 'Verify & Continue'}
           </Button>
         </DialogActions>
