@@ -5,7 +5,7 @@ import {
   Container, Box, Typography, Paper, Button, Avatar, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, TextField, MenuItem
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -254,19 +254,86 @@ function ProfileDashboard() {
             )}
           </Box>
           
-          {/* Using same form logic as before */}
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Basic Information</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="caption" color="text.secondary">Full Name</Typography>
-              {isEditing ? <TextField fullWidth size="small" name="fullName" value={editData.fullName} onChange={handleEditChange} /> : <Typography>{profile.fullName}</Typography>}
+              {isEditing ? <TextField fullWidth size="small" name="fullName" value={editData.fullName} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.fullName}</Typography>}
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="caption" color="text.secondary">Phone Number</Typography>
-              {isEditing ? <TextField fullWidth size="small" name="phone" value={editData.phone} onChange={handleEditChange} /> : <Typography>{profile.phone || 'Not provided'}</Typography>}
+              {isEditing ? <TextField fullWidth size="small" name="phone" value={editData.phone} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.phone || 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">Age</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="age" type="number" value={editData.age} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.age || 'N/A'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">Gender</Typography>
+              {isEditing ? (
+                <TextField select fullWidth size="small" name="gender" value={editData.gender} onChange={handleEditChange}>
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                  <MenuItem value="Prefer not to say">Prefer not to say</MenuItem>
+                </TextField>
+              ) : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.gender || 'N/A'}</Typography>}
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Typography variant="caption" color="text.secondary">Bio</Typography>
-              {isEditing ? <TextField fullWidth multiline rows={3} name="bio" value={editData.bio} onChange={handleEditChange} /> : <Typography>{profile.bio || 'Not provided'}</Typography>}
+              {isEditing ? <TextField fullWidth multiline rows={3} name="bio" value={editData.bio} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.bio || 'Not provided'}</Typography>}
+            </Grid>
+          </Grid>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Professional Information</Typography>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">Company</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="company" value={editData.company} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.company || 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">Job Title</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="jobTitle" value={editData.jobTitle} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.jobTitle || 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">Expertise Area</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="expertiseArea" value={editData.expertiseArea} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.expertiseArea || 'Not provided'}</Typography>}
+            </Grid>
+          </Grid>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Location</Typography>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">Address</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="address" value={editData.address} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.address || 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">City</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="city" value={editData.city} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.city || 'N/A'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">Country</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="country" value={editData.country} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.country || 'N/A'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="caption" color="text.secondary">Postal Code</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="postalCode" value={editData.postalCode} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.postalCode || 'N/A'}</Typography>}
+            </Grid>
+          </Grid>
+
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Social Links</Typography>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">GitHub</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="githubUrl" type="url" value={editData.githubUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.githubUrl ? <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.githubUrl}</a> : 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">LinkedIn</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="linkedinUrl" type="url" value={editData.linkedinUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.linkedinUrl ? <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.linkedinUrl}</a> : 'Not provided'}</Typography>}
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Typography variant="caption" color="text.secondary">Twitter</Typography>
+              {isEditing ? <TextField fullWidth size="small" name="twitterUrl" type="url" value={editData.twitterUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.twitterUrl ? <a href={profile.twitterUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.twitterUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
           </Grid>
         </Paper>
