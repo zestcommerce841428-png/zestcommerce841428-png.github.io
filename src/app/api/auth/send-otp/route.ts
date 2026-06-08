@@ -20,11 +20,12 @@ export async function POST(req: Request) {
       console.warn("Firestore not initialized, cannot save OTP.");
     }
 
+    const port = Number(process.env.SMTP_PORT) || 465;
     // SMTP configuration
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.hostinger.com',
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: true,
+      port: port,
+      secure: port === 465, // true for 465, false for 587
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
