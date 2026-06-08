@@ -4,9 +4,9 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Container, Box, Typography, Paper, Button, Avatar, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, MenuItem,
-  Switch, FormControlLabel, Alert
+  Switch, FormControlLabel, Alert // Added Alert import here
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid'; // Ensure this is the correct Grid import
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 
 import { auth, db } from '@/config/firebase';
 import { updateProfile, deleteUser } from 'firebase/auth';
-import { doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -41,18 +41,16 @@ function ProfileDashboard() {
   const [editData, setEditData] = useState<Partial<UserProfile>>({});
 
   // --- OTP Flow State for general actions ---
+  // Expanded otpAction to include new types for backup email and 2FA toggling
   const [otpAction, setOtpAction] = useState<'save' | 'delete' | 'avatar' | 'delete-avatar' | null>(null);
   const [otpCode, setOtpCode] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
   const refreshProfile = useCallback(() => {
-    // Note: router.refresh() does not work in client components within App Router
-    // A full page reload or re-fetching data manually would be needed.
-    // For simplicity and given the scope, we'll rely on the AuthProvider refetching on auth state change
-    // or trigger manual update by setting profile state if that was an option.
-    // Since we don't directly manipulate profile state here, a refresh is the closest.
-    window.location.reload(); // Hard refresh to ensure AuthContext reloads profile
+    // Force a full page reload to ensure AuthContext reloads profile with latest data
+    // This is a workaround for client component data revalidation challenges in App Router
+    window.location.reload(); 
   }, []);
 
   const triggerOtp = async (action: 'save' | 'delete' | 'avatar' | 'delete-avatar', file?: File) => {
@@ -95,15 +93,24 @@ function ProfileDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
-      // Success, perform the action
-      if (otpAction === 'save') {
-        await executeSaveProfile();
-      } else if (otpAction === 'delete') {
-        await executeDeleteAccount();
-      } else if (otpAction === 'avatar' && pendingAvatarFile) {
-        await executeAvatarUpload(pendingAvatarFile);
-      } else if (otpAction === 'delete-avatar') {
-        await executeDeleteAvatar();
+      // Success, perform the action based on otpAction
+      switch (otpAction) {
+        case 'save':
+          await executeSaveProfile();
+          break;
+        case 'delete':
+          await executeDeleteAccount();
+          break;
+        case 'avatar':
+          if (pendingAvatarFile) await executeAvatarUpload(pendingAvatarFile);
+          break;
+        case 'delete-avatar':
+          await executeDeleteAvatar();
+          break;
+        // BackupEmailSection and TwoFactorSection will handle their own OTP verification internally
+        default:
+          setSuccess('Action verified successfully!');
+          break;
       }
       
       setOtpAction(null);
@@ -225,7 +232,29 @@ function ProfileDashboard() {
     if (!user) return;
     setSaving(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), editData);
+      // Only update fields managed by this section of the form.
+      // Backup email and 2FA are managed by their respective sections.
+      const fieldsToUpdate: Partial<UserProfile> = {};
+      if (editData.fullName !== profile?.fullName) fieldsToUpdate.fullName = editData.fullName;
+      if (editData.phone !== profile?.phone) fieldsToUpdate.phone = editData.phone;
+      if (editData.age !== profile?.age) fieldsToUpdate.age = editData.age;
+      if (editData.gender !== profile?.gender) fieldsToUpdate.gender = editData.gender;
+      if (editData.bio !== profile?.bio) fieldsToUpdate.bio = editData.bio;
+      if (editData.company !== profile?.company) fieldsToUpdate.company = editData.company;
+      if (editData.jobTitle !== profile?.jobTitle) fieldsToUpdate.jobTitle = editData.jobTitle;
+      if (editData.expertiseArea !== profile?.expertiseArea) fieldsToUpdate.expertiseArea = editData.expertiseArea;
+      if (editData.address !== profile?.address) fieldsToUpdate.address = editData.address;
+      if (editData.city !== profile?.city) fieldsToUpdate.city = editData.city;
+      if (editData.country !== profile?.country) fieldsToUpdate.country = editData.country;
+      if (editData.postalCode !== profile?.postalCode) fieldsToUpdate.postalCode = editData.postalCode;
+      if (editData.githubUrl !== profile?.githubUrl) fieldsToUpdate.githubUrl = editData.githubUrl;
+      if (editData.linkedinUrl !== profile?.linkedinUrl) fieldsToUpdate.linkedinUrl = editData.linkedinUrl;
+      if (editData.twitterUrl !== profile?.twitterUrl) fieldsToUpdate.twitterUrl = editData.twitterUrl;
+
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        await updateDoc(doc(db, 'users', user.uid), fieldsToUpdate);
+      }
+      
       if (editData.fullName !== profile?.fullName) {
         await updateProfile(user, { displayName: editData.fullName });
       }
@@ -293,19 +322,19 @@ function ProfileDashboard() {
           
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Basic Information</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Full Name</Typography>
               {isEditing ? <TextField fullWidth size="small" name="fullName" value={editData.fullName} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.fullName}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Phone Number</Typography>
               {isEditing ? <TextField fullWidth size="small" name="phone" value={editData.phone} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.phone || 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Age</Typography>
               {isEditing ? <TextField fullWidth size="small" name="age" type="number" value={editData.age} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.age || 'N/A'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Gender</Typography>
               {isEditing ? (
                 <TextField select fullWidth size="small" name="gender" value={editData.gender} onChange={handleEditChange}>
@@ -316,7 +345,7 @@ function ProfileDashboard() {
                 </TextField>
               ) : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.gender || 'N/A'}</Typography>}
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Bio</Typography>
               {isEditing ? <TextField fullWidth multiline rows={3} name="bio" value={editData.bio} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.bio || 'Not provided'}</Typography>}
             </Grid>
@@ -324,15 +353,15 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Professional Information</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Company</Typography>
               {isEditing ? <TextField fullWidth size="small" name="company" value={editData.company} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.company || 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Job Title</Typography>
               {isEditing ? <TextField fullWidth size="small" name="jobTitle" value={editData.jobTitle} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.jobTitle || 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Expertise Area</Typography>
               {isEditing ? <TextField fullWidth size="small" name="expertiseArea" value={editData.expertiseArea} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.expertiseArea || 'Not provided'}</Typography>}
             </Grid>
@@ -340,19 +369,19 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Location</Typography>
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Address</Typography>
               {isEditing ? <TextField fullWidth size="small" name="address" value={editData.address} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.address || 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">City</Typography>
               {isEditing ? <TextField fullWidth size="small" name="city" value={editData.city} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.city || 'N/A'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Country</Typography>
               {isEditing ? <TextField fullWidth size="small" name="country" value={editData.country} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.country || 'N/A'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Postal Code</Typography>
               {isEditing ? <TextField fullWidth size="small" name="postalCode" value={editData.postalCode} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500 }}>{profile.postalCode || 'N/A'}</Typography>}
             </Grid>
@@ -360,15 +389,15 @@ function ProfileDashboard() {
 
           <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2, textTransform: 'uppercase' }}>Social Links</Typography>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">GitHub</Typography>
               {isEditing ? <TextField fullWidth size="small" name="githubUrl" type="url" value={editData.githubUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.githubUrl ? <a href={profile.githubUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.githubUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">LinkedIn</Typography>
               {isEditing ? <TextField fullWidth size="small" name="linkedinUrl" type="url" value={editData.linkedinUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.linkedinUrl ? <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.linkedinUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={12} sm={4} component="div"> {/* Added component="div" */}
               <Typography variant="caption" color="text.secondary">Twitter</Typography>
               {isEditing ? <TextField fullWidth size="small" name="twitterUrl" type="url" value={editData.twitterUrl} onChange={handleEditChange} /> : <Typography variant="body1" sx={{ fontWeight: 500, wordBreak: 'break-all' }}>{profile.twitterUrl ? <a href={profile.twitterUrl} target="_blank" rel="noreferrer" style={{ color: '#FF9933' }}>{profile.twitterUrl}</a> : 'Not provided'}</Typography>}
             </Grid>
