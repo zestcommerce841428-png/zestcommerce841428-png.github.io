@@ -5,7 +5,7 @@ import {
   Container, Box, Typography, Paper, Button, Avatar, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Alert, TextField, MenuItem
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Grid } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import WarningIcon from '@mui/icons-material/Warning';
