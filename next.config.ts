@@ -18,7 +18,6 @@ const getGitInfo = () => {
 const gitInfo = getGitInfo();
 
 const nextConfig: NextConfig = {
-  output: 'export',
   images: {
     unoptimized: true,
   },
