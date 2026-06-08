@@ -38,12 +38,12 @@ function ProfileDashboard() {
   const [editData, setEditData] = useState<any>({});
 
   // --- OTP Flow State ---
-  const [otpAction, setOtpAction] = useState<'save' | 'delete' | 'avatar' | null>(null);
+  const [otpAction, setOtpAction] = useState<'save' | 'delete' | 'avatar' | 'delete-avatar' | null>(null);
   const [otpCode, setOtpCode] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
-  const triggerOtp = async (action: 'save' | 'delete' | 'avatar', file?: File) => {
+  const triggerOtp = async (action: 'save' | 'delete' | 'avatar' | 'delete-avatar', file?: File) => {
     if (!user || !user.email) return;
     setError('');
     setSuccess('');
@@ -90,6 +90,8 @@ function ProfileDashboard() {
         await executeDeleteAccount();
       } else if (otpAction === 'avatar' && pendingAvatarFile) {
         await executeAvatarUpload(pendingAvatarFile);
+      } else if (otpAction === 'delete-avatar') {
+        await executeDeleteAvatar();
       }
       
       setOtpAction(null);
@@ -143,11 +145,28 @@ function ProfileDashboard() {
       await updateProfile(user, { photoURL: downloadURL });
       await updateDoc(doc(db, 'users', user.uid), { photoURL: downloadURL });
       setSuccess("Profile picture updated successfully!");
-    } catch (err: any) {
-      setError(err.message || "Failed to upload picture.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to upload picture.";
+      setError(errorMessage);
     } finally {
       setUploading(false);
       setPendingAvatarFile(null);
+    }
+  };
+
+  const executeDeleteAvatar = async () => {
+    if (!user) return;
+    setUploading(true);
+    try {
+      // Remove photo URL from Firebase Auth and Firestore
+      await updateProfile(user, { photoURL: null });
+      await updateDoc(doc(db, 'users', user.uid), { photoURL: null });
+      setSuccess("Profile picture removed successfully!");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to remove picture.";
+      setError(errorMessage);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -235,6 +254,11 @@ function ProfileDashboard() {
               <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={() => fileInputRef.current?.click()} disabled={uploading || otpLoading}>
                 Upload New Avatar
               </Button>
+              {profile.photoURL && (
+                <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => triggerOtp('delete-avatar')} disabled={uploading || otpLoading}>
+                  Remove Avatar
+                </Button>
+              )}
             </Box>
           </Box>
         </Paper>
