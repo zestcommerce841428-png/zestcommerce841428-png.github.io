@@ -3,13 +3,14 @@ import { execSync } from 'child_process';
 
 const getGitInfo = () => {
   try {
-    const commitHash = execSync('git log -1 --format="%h"').toString().trim();
-    const timeAgo = execSync('git log -1 --format="%cr"').toString().trim();
-    let branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+    const commitHash = execSync('git log -1 --format="%h"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
+    const timeAgo = execSync('git log -1 --format="%cr"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
+    let branch = execSync('git rev-parse --abbrev-ref HEAD', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
     if (branch === 'main') branch = 'Main';
     if (branch === 'master') branch = 'Master';
     return { commitHash, timeAgo, branch };
   } catch (e) {
+    // Return default values when git is not available (e.g., in Vercel build environment)
     return { commitHash: 'unknown', timeAgo: 'unknown', branch: 'unknown' };
   }
 };
