@@ -179,7 +179,12 @@ export default function AccessibilityWidgetV2() {
       <Drawer
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={(event, reason) => {
+          // Only close on backdrop click or escape key, not on internal clicks
+          if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
+            setOpen(false);
+          }
+        }}
         slotProps={{
           paper: {
             sx: {
@@ -189,8 +194,6 @@ export default function AccessibilityWidgetV2() {
           },
         }}
       >
-        {/* Prevent clicks inside drawer from closing it */}
-        <Box onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <Box
           sx={{
@@ -773,7 +776,6 @@ export default function AccessibilityWidgetV2() {
             )}
           </TabPanel>
         </Box>
-        </Box> {/* Close stopPropagation wrapper */}
       </Drawer>
     </>
   );
