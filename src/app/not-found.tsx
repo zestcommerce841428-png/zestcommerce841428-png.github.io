@@ -6,6 +6,9 @@ import { Container, Box, Typography, Button } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 function NotFoundContent() {
   return (
     <Container maxWidth="md">
