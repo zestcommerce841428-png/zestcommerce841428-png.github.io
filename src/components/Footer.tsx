@@ -7,6 +7,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import Link from 'next/link';
 
 import { useLanguage } from '@/context/LanguageContext';
+import BuildInfo from './BuildInfo';
 
 const TricolorLogoFooter = () => (
   <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '8px' }}>
@@ -200,12 +201,22 @@ export default function Footer() {
               &copy; {new Date().getFullYear()} IndianToolsHub. All rights reserved.
             </Typography>
             <Typography variant="caption" sx={{ color: '#475569', display: 'block' }}>
-              Made with ❤️ in India by Naushad. Assisted by Antigravity. Hosted on GitHub Pages.
+              Made with ❤️ in India by Naushad. Assisted by Antigravity. Hosted on Vercel.
             </Typography>
           </Box>
-          <Typography variant="body2" sx={{ color: '#64748b', textAlign: { xs: 'center', sm: 'right' } }}>
-            Build: {process.env.NEXT_PUBLIC_BUILD_VERSION} - {process.env.NEXT_PUBLIC_BUILD_TIME_AGO} {process.env.NEXT_PUBLIC_BUILD_BRANCH}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#64748b',
+                display: { xs: 'none', sm: 'block' },
+                mr: 1,
+              }}
+            >
+              Latest:
+            </Typography>
+            <BuildInfo variant="full" />
+          </Box>
         </Box>
       </Container>
     </Box>
