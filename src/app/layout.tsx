@@ -4,13 +4,16 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import './globals.css';
+import '@/styles/accessibility-v2.css';
 
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
+import { AccessibilityProviderV2 } from '@/context/AccessibilityContextV2';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
 import AccessibilityWidget from '@/components/AccessibilityWidget';
+import AccessibilityWidgetV2 from '@/components/accessibility/AccessibilityWidgetV2';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -56,13 +59,15 @@ export default function RootLayout({
     <AuthProvider>
       <LanguageProvider>
         <AccessibilityProvider>
-          <CustomThemeProvider>
-            <CssBaseline />
-            <AccessibilityWidget />
-            <ScrollButtons />
-            {children}
-            <CookieConsent />
-          </CustomThemeProvider>
+          <AccessibilityProviderV2>
+            <CustomThemeProvider>
+              <CssBaseline />
+              <AccessibilityWidgetV2 />
+              <ScrollButtons />
+              {children}
+              <CookieConsent />
+            </CustomThemeProvider>
+          </AccessibilityProviderV2>
         </AccessibilityProvider>
       </LanguageProvider>
     </AuthProvider>
