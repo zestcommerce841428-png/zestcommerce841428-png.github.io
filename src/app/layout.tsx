@@ -16,6 +16,10 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 import type { Viewport } from 'next';
 
+// Force all routes to be dynamic to avoid useSearchParams build errors
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 export const metadata: Metadata = {
   title: 'IndianToolsHub | Professional All-in-One Tool Suite',
   description: 'Fast, secure, and client-side web utility tools for images, documents, calculators, developers, and designers.',
