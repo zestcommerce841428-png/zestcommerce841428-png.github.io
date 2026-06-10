@@ -11,10 +11,12 @@ const otpStore: { [key: string]: { otp: string; expires: number; purpose: string
 
 // Email transporter configuration
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '465'),
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: process.env.SMTP_USER || process.env.EMAIL_USER,
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     // Send email
     await transporter.sendMail({
-      from: `"IndianToolsHub Security" <${process.env.EMAIL_USER}>`,
+      from: `"IndianToolsHub Security" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: '🔐 Password Reset Request - IndianToolsHub',
       text,
@@ -229,7 +231,7 @@ export async function PUT(req: NextRequest) {
     `;
 
     await transporter.sendMail({
-      from: `"IndianToolsHub Security" <${process.env.EMAIL_USER}>`,
+      from: `"IndianToolsHub Security" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: '✅ Password Reset Verified - Check Your Email',
       html: confirmationHtml,

@@ -10,11 +10,14 @@ import nodemailer from 'nodemailer';
 const otpStore: { [key: string]: { otp: string; expires: number; purpose: string } } = {};
 
 // Email transporter configuration
+const port = Number(process.env.SMTP_PORT) || 465;
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: port,
+  secure: port === 465,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
+    user: process.env.SMTP_USER || process.env.EMAIL_USER,
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -66,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     // Send email
     await transporter.sendMail({
-      from: `"IndianToolsHub Security" <${process.env.EMAIL_USER}>`,
+      from: `"IndianToolsHub Security" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: '🔐 Password Change Verification - IndianToolsHub',
       text,
@@ -217,7 +220,7 @@ export async function PUT(req: NextRequest) {
     `;
 
     await transporter.sendMail({
-      from: `"IndianToolsHub Security" <${process.env.EMAIL_USER}>`,
+      from: `"IndianToolsHub Security" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
       to: email,
       subject: '✅ Password Changed Successfully - IndianToolsHub',
       html: confirmationHtml,
