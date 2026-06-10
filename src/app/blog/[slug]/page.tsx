@@ -11,6 +11,9 @@ import Link from 'next/link';
 import { BLOG_POSTS, BlogPost } from '@/data/blogs';
 import { generateBlogSEO, generateStructuredData } from '@/utils/seo';
 
+// Force dynamic rendering to avoid useSearchParams Suspense issues
+export const dynamic = 'force-dynamic';
+
 type Props = {
   params: Promise<{ slug: string }>;
 };

@@ -13,6 +13,10 @@ import Link from 'next/link';
 import ToolRenderer from './ToolRenderer';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { generateToolSEO } from '@/utils/seo';
+
+// Force dynamic rendering to avoid useSearchParams Suspense issues
+export const dynamic = 'force-dynamic';
+
 // Generate metadata dynamically on the server
 type Props = {
   params: Promise<{ slug: string }>;
