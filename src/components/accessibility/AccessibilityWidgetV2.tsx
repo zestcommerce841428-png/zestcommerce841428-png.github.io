@@ -159,7 +159,10 @@ export default function AccessibilityWidgetV2() {
       <Fab
         color="primary"
         aria-label="accessibility settings"
-        onClick={() => setOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
         sx={{
           position: 'fixed',
           bottom: 20,
