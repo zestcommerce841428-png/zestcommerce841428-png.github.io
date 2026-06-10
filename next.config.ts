@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  output: 'standalone',
   env: {
     NEXT_PUBLIC_BUILD_VERSION: gitInfo.commitHash,
     NEXT_PUBLIC_BUILD_TIME_AGO: gitInfo.timeAgo,
@@ -32,10 +33,6 @@ const nextConfig: NextConfig = {
     // Dangerously allow production builds to successfully complete even if
     // your project has type errors.
     ignoreBuildErrors: true,
-  },
-  experimental: {
-    // Skip static generation for pages with useSearchParams
-    missingSuspenseWithCSRBailout: false,
   },
 };
 
