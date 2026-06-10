@@ -12,7 +12,6 @@ import { AccessibilityProviderV2 } from '@/context/AccessibilityContextV2';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
-import AccessibilityWidget from '@/components/AccessibilityWidget';
 import AccessibilityWidgetV2 from '@/components/accessibility/AccessibilityWidgetV2';
 import ReadingGuidesManager from '@/components/accessibility/ReadingGuidesManager';
 import TextToSpeechManager from '@/components/accessibility/TextToSpeechManager';
@@ -71,6 +70,8 @@ export default function RootLayout({
               <TextToSpeechManager />
               <CursorEffectsManager />
               <KeyboardShortcutsManager />
+              <AutoScrollManager />
+              <MagnifierManager />
               <ScrollButtons />
               {children}
               <CookieConsent />
