@@ -6,7 +6,7 @@ import { useAccessibilityV2 } from '@/context/AccessibilityContextV2';
 /**
  * VoiceCommandsManager - Web Speech Recognition API for voice control
  * Allows users to control accessibility features using voice commands
- *
+ * 
  * Supported Commands:
  * - "increase text size" / "decrease text size"
  * - "enable high contrast" / "disable high contrast"
@@ -51,12 +51,9 @@ declare global {
   }
 }
 
-// Check if browser supports speech recognition
-const isSpeechRecognitionSupported = typeof window !== 'undefined' &&
-  ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
-
 export default function VoiceCommandsManager() {
   const a11y = useAccessibilityV2();
+  const [isMounted, setIsMounted] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [lastCommand, setLastCommand] = useState<string>('');
@@ -90,7 +87,7 @@ export default function VoiceCommandsManager() {
   }, []);
 
   const speak = useCallback((text: string) => {
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.2;
@@ -158,7 +155,7 @@ export default function VoiceCommandsManager() {
     if (command.includes('stop reading')) {
       a11y.setTextToSpeech(false);
       a11y.setAutoReadPage(false);
-      window.speechSynthesis.cancel();
+      if (typeof window !== 'undefined') window.speechSynthesis.cancel();
       speak('Stopped reading');
       return;
     }
@@ -178,12 +175,12 @@ export default function VoiceCommandsManager() {
 
     // Scrolling commands
     if (command.includes('scroll down')) {
-      window.scrollBy({ top: 300, behavior: 'smooth' });
+      if (typeof window !== 'undefined') window.scrollBy({ top: 300, behavior: 'smooth' });
       return;
     }
 
     if (command.includes('scroll up')) {
-      window.scrollBy({ top: -300, behavior: 'smooth' });
+      if (typeof window !== 'undefined') window.scrollBy({ top: -300, behavior: 'smooth' });
       return;
     }
 
@@ -241,13 +238,27 @@ export default function VoiceCommandsManager() {
     console.log('[Voice Commands] Command not recognized:', command);
   }, [a11y, speak, navigateToNextHeading, navigateToPreviousHeading]);
 
+  // Mount detection for SSR safety
   useEffect(() => {
-    if (!a11y.voiceCommands || !isSpeechRecognitionSupported) {
-      // Stop recognition if voice commands are disabled or not supported
+    const timer = setTimeout(() => setIsMounted(true), 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !a11y.voiceCommands) {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
         setIsListening(false);
       }
+      return;
+    }
+
+    // Check browser support
+    const hasSupport = typeof window !== 'undefined' && 
+      ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+
+    if (!hasSupport) {
+      console.log('[Voice Commands] Speech recognition not supported in this browser');
       return;
     }
 
@@ -314,10 +325,17 @@ export default function VoiceCommandsManager() {
         recognitionRef.current.stop();
       }
     };
-  }, [a11y.voiceCommands, processVoiceCommand]);
+  }, [isMounted, a11y.voiceCommands, processVoiceCommand]);
 
-  // Render listening indicator
-  if (!a11y.voiceCommands || !isSpeechRecognitionSupported) {
+  // Don't render on server or if not mounted or not supported
+  if (!isMounted || !a11y.voiceCommands) {
+    return null;
+  }
+
+  const hasSupport = typeof window !== 'undefined' && 
+    ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window);
+
+  if (!hasSupport) {
     return null;
   }
 

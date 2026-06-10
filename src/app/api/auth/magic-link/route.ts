@@ -3,22 +3,35 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import admin from 'firebase-admin';
 
-// Initialize Firebase Admin SDK
+// Initialize Firebase Admin SDK (optional - only if credentials provided)
 if (!admin.apps.length) {
   try {
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-      ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-      : {
-          projectId: process.env.FIREBASE_PROJECT_ID,
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        };
+    // Check if environment variables are provided
+    const hasFirebaseCredentials =
+      process.env.FIREBASE_PROJECT_ID &&
+      process.env.FIREBASE_CLIENT_EMAIL &&
+      process.env.FIREBASE_PRIVATE_KEY;
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    if (hasFirebaseCredentials) {
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+        ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+        : {
+            project_id: process.env.FIREBASE_PROJECT_ID,  // snake_case required by Firebase
+            client_email: process.env.FIREBASE_CLIENT_EMAIL,  // snake_case required by Firebase
+            private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          };
+
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+      });
+      
+      console.log('[Firebase Admin] Initialized successfully');
+    } else {
+      console.log('[Firebase Admin] Skipped - credentials not provided. Magic link auto-login disabled.');
+    }
   } catch (error) {
-    console.error('Firebase Admin initialization error:', error);
+    console.error('[Firebase Admin] Initialization error:', error);
+    console.log('[Firebase Admin] Magic link will work but auto-login disabled. Add Firebase credentials to enable auto-login.');
   }
 }
 
@@ -230,6 +243,17 @@ export async function GET(req: Request) {
     // Delete token (single use)
     delete magicLinkStore[token];
 
+    // Check if Firebase Admin is initialized
+    if (!admin.apps.length) {
+      console.log('[Magic Link] Firebase Admin not initialized. Returning success without custom token.');
+      return NextResponse.json({
+        success: true,
+        email,
+        message: 'Magic link verified successfully. Please log in with your email.',
+        fallback: true,
+      });
+    }
+
     try {
       // Get or create user in Firebase
       let firebaseUser;
@@ -254,13 +278,13 @@ export async function GET(req: Request) {
         message: 'Magic link verified successfully',
       });
     } catch (firebaseError) {
-      console.error('Firebase error during magic link verification:', firebaseError);
+      console.error('[Magic Link] Firebase error during verification:', firebaseError);
       
       // Fallback: return success without custom token (will redirect to login)
       return NextResponse.json({
         success: true,
         email,
-        message: 'Magic link verified successfully',
+        message: 'Magic link verified successfully. Please log in with your email.',
         fallback: true,
       });
     }
