@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SendIcon from '@mui/icons-material/Send';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -93,8 +94,14 @@ export default function ContactPage() {
     {
       icon: <PhoneIcon sx={{ fontSize: 32, color: '#10b981' }} />,
       title: 'Call Us',
-      value: '+91 XXX XXX XXXX',
-      link: 'tel:+91XXXXXXXXXX',
+      value: '+91 7492 068 998',
+      link: 'tel:+917492068998',
+    },
+    {
+      icon: <WhatsAppIcon sx={{ fontSize: 32, color: '#25D366' }} />,
+      title: 'WhatsApp Us',
+      value: '+91 7492 068 998',
+      link: 'https://wa.me/917492068998',
     },
     {
       icon: <LocationOnIcon sx={{ fontSize: 32, color: '#f59e0b' }} />,

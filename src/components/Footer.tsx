@@ -38,6 +38,7 @@ export default function Footer() {
   const quickLinks = [
     { title: t('home'), href: '/' },
     { title: 'Blog', href: '/blog' },
+    { title: 'Contact', href: '/contact' },
     { title: t('about'), href: '/about' },
     { title: t('privacy'), href: '/privacy-policy' },
     { title: t('terms'), href: '/term-conditions' },

@@ -39,6 +39,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArticleIcon from '@mui/icons-material/Article';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import EmailIcon from '@mui/icons-material/Email';
 import Link from 'next/link';
 
 import { useLanguage, LANGUAGES } from '@/context/LanguageContext';
@@ -190,6 +191,7 @@ export default function Header() {
   const navLinks = [
     { text: t('home'), href: '/', icon: <HomeIcon /> },
     { text: 'Blog', href: '/blog', icon: <ArticleIcon /> },
+    { text: 'Contact', href: '/contact', icon: <EmailIcon /> },
     { text: t('about'), href: '/about', icon: <InfoIcon /> },
     { text: t('privacy'), href: '/privacy-policy', icon: <PolicyIcon /> },
     { text: t('terms'), href: '/term-conditions', icon: <GavelIcon /> },
