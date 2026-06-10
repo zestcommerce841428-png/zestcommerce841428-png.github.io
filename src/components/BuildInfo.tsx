@@ -11,13 +11,18 @@ interface BuildInfoProps {
 }
 
 export default function BuildInfo({ variant = 'full' }: BuildInfoProps) {
-  const commitHash = process.env.NEXT_PUBLIC_BUILD_VERSION || 'unknown';
-  const timeAgo = process.env.NEXT_PUBLIC_BUILD_TIME_AGO || 'unknown';
-  const branch = process.env.NEXT_PUBLIC_BUILD_BRANCH || 'unknown';
+  const commitHash = process.env.NEXT_PUBLIC_BUILD_VERSION || 'latest';
+  const timeAgo = process.env.NEXT_PUBLIC_BUILD_TIME_AGO || 'recently';
+  const branch = process.env.NEXT_PUBLIC_BUILD_BRANCH || 'Main';
+  
+  // Don't render if all values are defaults (hide completely)
+  if (commitHash === 'latest' && timeAgo === 'recently' && branch === 'Main') {
+    return null;
+  }
   
   // GitHub repository URL
   const repoUrl = 'https://github.com/zestcommerce841428-png/IndianToolsHub';
-  const commitUrl = commitHash !== 'unknown' ? `${repoUrl}/commit/${commitHash}` : repoUrl;
+  const commitUrl = commitHash !== 'latest' && commitHash !== 'unknown' ? `${repoUrl}/commit/${commitHash}` : repoUrl;
 
   if (variant === 'compact') {
     return (

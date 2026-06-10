@@ -4,15 +4,20 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const getGitInfo = () => {
   try {
-    const commitHash = execSync('git log -1 --format="%h"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
-    const timeAgo = execSync('git log -1 --format="%cr"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
-    let branch = execSync('git rev-parse --abbrev-ref HEAD', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim();
+    const commitHash = execSync('git log -1 --format="%h"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim().replace(/['"]/g, '');
+    const timeAgo = execSync('git log -1 --format="%cr"', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim().replace(/['"]/g, '');
+    let branch = execSync('git rev-parse --abbrev-ref HEAD', { stdio: ['pipe', 'pipe', 'pipe'] }).toString().trim().replace(/['"]/g, '');
     if (branch === 'main') branch = 'Main';
     if (branch === 'master') branch = 'Master';
     return { commitHash, timeAgo, branch };
   } catch (e) {
     // Return default values when git is not available (e.g., in Vercel build environment)
-    return { commitHash: 'unknown', timeAgo: 'unknown', branch: 'unknown' };
+    // Use VERCEL_GIT environment variables as fallback
+    return {
+      commitHash: process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 7) || 'latest',
+      timeAgo: 'just now',
+      branch: process.env.VERCEL_GIT_COMMIT_REF || 'Main'
+    };
   }
 };
 
