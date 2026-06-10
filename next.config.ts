@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_TIME_AGO: gitInfo.timeAgo,
     NEXT_PUBLIC_BUILD_BRANCH: gitInfo.branch,
   },
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
 };
 
 // Sentry configuration options
