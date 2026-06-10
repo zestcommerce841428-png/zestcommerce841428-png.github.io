@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
     // your project has type errors.
     ignoreBuildErrors: true,
   },
+  experimental: {
+    // Skip static generation for pages with useSearchParams
+    missingSuspenseWithCSRBailout: false,
+  },
 };
 
 // Sentry configuration options
