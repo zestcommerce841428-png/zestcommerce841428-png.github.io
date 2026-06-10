@@ -244,7 +244,7 @@ export default function Home() {
         {filteredTools.length > 0 ? (
           <Grid container spacing={3}>
             {filteredTools.map((tool) => (
-              <Grid item xs={12} sm={6} md={4} key={tool.slug} component="div"> {/* Added component="div" */}
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.slug}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     <Box
@@ -345,7 +345,7 @@ export default function Home() {
 
         <Grid container spacing={3}>
           {currentBlogs.map((post) => (
-            <Grid item xs={12} sm={6} md={4} key={post.slug} component="div"> {/* Added component="div" */}
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.slug}>
               <Card
                 sx={{
                   height: '100%',
