@@ -9,22 +9,60 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { BLOG_POSTS, BlogPost } from '@/data/blogs';
+import { generateBlogSEO, generateStructuredData } from '@/utils/seo';
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
-// 1. Generate Metadata dynamically for SEO crawler indexing
+// 1. Generate full SEO Metadata for blog post pages
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = BLOG_POSTS.find((p) => p.slug === slug);
   if (!post) {
     return { title: 'Article Not Found | IndianToolsHub' };
   }
+
+  const seoData = generateBlogSEO(
+    post.slug,
+    post.title,
+    post.description,
+    post.publishDate,
+    post.publishDate,
+  );
+
   return {
-    title: `${post.title} | IndianToolsHub Blog`,
-    description: post.description,
+    title: seoData.title,
+    description: seoData.description,
     keywords: post.tags.join(', '),
+    authors: [{ name: seoData.author || 'IndianToolsHub Team' }],
+    alternates: {
+      canonical: seoData.canonical,
+    },
+    openGraph: {
+      title: seoData.title,
+      description: seoData.description,
+      url: seoData.canonical,
+      siteName: 'IndianToolsHub',
+      type: 'article',
+      publishedTime: seoData.publishedTime,
+      modifiedTime: seoData.modifiedTime,
+      images: seoData.ogImage
+        ? [{ url: seoData.ogImage, width: 1200, height: 630, alt: seoData.title }]
+        : undefined,
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoData.title,
+      description: seoData.description,
+      images: seoData.ogImage ? [seoData.ogImage] : undefined,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+    },
   };
 }
 

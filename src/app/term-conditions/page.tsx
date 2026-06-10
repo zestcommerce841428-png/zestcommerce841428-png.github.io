@@ -1,9 +1,43 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import { Container, Box, Typography, Paper, Divider } from '@mui/material';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { generateSEO } from '@/utils/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seoData = generateSEO('terms', {
+    title: 'Terms of Use | IndianToolsHub',
+    description: 'Read the IndianToolsHub Terms of Use. Understand how to use our 105+ free online tools responsibly and legally. No registration required for most tools.',
+    keywords: 'IndianToolsHub terms of use, terms and conditions, usage policy, free tools legal, web tools terms',
+    canonical: 'https://indian-tools-hub.vercel.app/term-conditions',
+    ogType: 'website',
+  });
+  return {
+    title: seoData.title,
+    description: seoData.description,
+    keywords: seoData.keywords,
+    alternates: { canonical: seoData.canonical },
+    openGraph: {
+      title: seoData.title,
+      description: seoData.description,
+      url: seoData.canonical,
+      siteName: 'IndianToolsHub',
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary',
+      title: seoData.title,
+      description: seoData.description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true },
+    },
+  };
+}
 
 export default function TermsOfUse() {
   return (

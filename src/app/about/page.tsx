@@ -1,9 +1,43 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import { Container, Box, Typography, Paper, Divider } from '@mui/material';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { generateSEO } from '@/utils/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seoData = generateSEO('about', {
+    title: 'About Us | IndianToolsHub — Free Online Tools for India',
+    description: 'Learn about IndianToolsHub — our mission to provide 105+ free, private, and client-side web utility tools for developers, designers, students, and professionals across India.',
+    keywords: 'about IndianToolsHub, free online tools India, privacy-first tools, web utilities, about us',
+    canonical: 'https://indian-tools-hub.vercel.app/about',
+    ogType: 'website',
+  });
+  return {
+    title: seoData.title,
+    description: seoData.description,
+    keywords: seoData.keywords,
+    alternates: { canonical: seoData.canonical },
+    openGraph: {
+      title: seoData.title,
+      description: seoData.description,
+      url: seoData.canonical,
+      siteName: 'IndianToolsHub',
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoData.title,
+      description: seoData.description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+    },
+  };
+}
 
 export default function About() {
   return (

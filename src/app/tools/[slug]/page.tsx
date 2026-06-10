@@ -12,6 +12,7 @@ import { TOOLS } from '@/data/tools';
 import Link from 'next/link';
 import ToolRenderer from './ToolRenderer';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { generateToolSEO } from '@/utils/seo';
 // Generate metadata dynamically on the server
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,14 +22,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = TOOLS.find((t) => t.slug === slug);
   if (!tool) {
-    return {
-      title: 'Tool Not Found - IndianToolsHub',
-    };
+    return { title: 'Tool Not Found - IndianToolsHub' };
   }
+  const seoData = generateToolSEO(tool.slug, tool.title, tool.description);
   return {
-    title: `${tool.title} | IndianToolsHub`,
-    description: tool.description,
+    title: seoData.title,
+    description: seoData.description,
     keywords: tool.keywords.join(', '),
+    alternates: { canonical: seoData.canonical },
+    openGraph: {
+      title: seoData.title,
+      description: seoData.description,
+      url: seoData.canonical,
+      siteName: 'IndianToolsHub',
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seoData.title,
+      description: seoData.description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+    },
   };
 }
 

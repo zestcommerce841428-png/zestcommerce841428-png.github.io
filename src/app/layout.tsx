@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'IndianToolsHub | Professional All-in-One Tool Suite',
     description: 'Fast, secure, and client-side web utility tools for images, documents, calculators, developers, and designers.',
-    url: 'https://zestcommerce841428-png.github.io/',
+    url: 'https://indian-tools-hub.vercel.app/',
     siteName: 'IndianToolsHub',
     type: 'website',
   },
@@ -82,10 +82,10 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "IndianToolsHub",
-              "url": "https://zestcommerce841428-png.github.io/",
+              "url": "https://indian-tools-hub.vercel.app/",
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://zestcommerce841428-png.github.io/?search={search_term_string}",
+                "target": "https://indian-tools-hub.vercel.app/?search={search_term_string}",
                 "query-input": "required name=search_term_string"
               }
             }),

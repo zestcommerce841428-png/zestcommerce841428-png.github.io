@@ -74,6 +74,34 @@ export function generateSEO(page: string, customData?: Partial<SEOData>): SEODat
       canonical: `${baseUrl}/auth/register`,
       author: defaultAuthor,
     },
+
+    about: {
+      title: 'About Us | IndianToolsHub — Free Online Tools for India',
+      description: 'Learn about IndianToolsHub — our mission to provide 105+ free, private, and client-side web utility tools for developers, designers, students, and professionals across India.',
+      keywords: 'about IndianToolsHub, free online tools India, privacy-first tools, web utilities, about us',
+      ogImage: defaultImage,
+      ogType: 'website',
+      canonical: `${baseUrl}/about`,
+      author: defaultAuthor,
+    },
+
+    privacy: {
+      title: 'Privacy Policy | IndianToolsHub',
+      description: 'Read the IndianToolsHub Privacy Policy. All tools operate 100% client-side in your browser. Your files, documents and data never leave your device.',
+      keywords: 'IndianToolsHub privacy policy, client-side tools, data privacy, no data upload, secure tools',
+      ogType: 'website',
+      canonical: `${baseUrl}/privacy-policy`,
+      author: defaultAuthor,
+    },
+
+    terms: {
+      title: 'Terms of Use | IndianToolsHub',
+      description: 'Read the IndianToolsHub Terms of Use. Understand how to use our 105+ free online tools responsibly and legally.',
+      keywords: 'IndianToolsHub terms of use, terms and conditions, usage policy, free tools legal',
+      ogType: 'website',
+      canonical: `${baseUrl}/term-conditions`,
+      author: defaultAuthor,
+    },
   };
 
   const baseSEO = defaults[page] || defaults.home;

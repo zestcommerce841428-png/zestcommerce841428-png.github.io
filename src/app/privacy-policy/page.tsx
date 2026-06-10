@@ -1,9 +1,43 @@
-'use client';
-
 import React from 'react';
+import { Metadata } from 'next';
 import { Container, Box, Typography, Paper, Divider } from '@mui/material';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { generateSEO } from '@/utils/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seoData = generateSEO('privacy', {
+    title: 'Privacy Policy | IndianToolsHub',
+    description: 'Read the IndianToolsHub Privacy Policy. All tools operate 100% client-side in your browser. Your files, documents and data never leave your device.',
+    keywords: 'IndianToolsHub privacy policy, client-side tools, data privacy, no data upload, secure tools',
+    canonical: 'https://indian-tools-hub.vercel.app/privacy-policy',
+    ogType: 'website',
+  });
+  return {
+    title: seoData.title,
+    description: seoData.description,
+    keywords: seoData.keywords,
+    alternates: { canonical: seoData.canonical },
+    openGraph: {
+      title: seoData.title,
+      description: seoData.description,
+      url: seoData.canonical,
+      siteName: 'IndianToolsHub',
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary',
+      title: seoData.title,
+      description: seoData.description,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true },
+    },
+  };
+}
 
 export default function PrivacyPolicy() {
   return (

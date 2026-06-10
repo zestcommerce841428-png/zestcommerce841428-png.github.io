@@ -4,11 +4,21 @@ import { db } from '@/config/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { generateOTPEmail } from '@/utils/emailTemplates';
 import { getSecurityContext } from '@/utils/securityContext';
+import { withRateLimit } from '@/utils/rateLimiter';
 
 export async function POST(req: Request) {
   try {
     const { email, subject } = await req.json();
     if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 });
+
+    // Check rate limit and cooldown
+    const rateLimitCheck = withRateLimit(`otp:${email}`, 'OTP');
+    if (!rateLimitCheck.success) {
+      return NextResponse.json(
+        { error: rateLimitCheck.error },
+        { status: rateLimitCheck.status || 429 }
+      );
+    }
 
     const otp = Math.floor(100000 + Math.random() + 900000).toString();
     const expiresAt = Date.now() + 10 * 60 * 1000; // 10 mins
