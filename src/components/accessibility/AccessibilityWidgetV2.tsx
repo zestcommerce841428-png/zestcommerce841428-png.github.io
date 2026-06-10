@@ -189,6 +189,8 @@ export default function AccessibilityWidgetV2() {
           },
         }}
       >
+        {/* Prevent clicks inside drawer from closing it */}
+        <Box onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <Box
           sx={{
@@ -771,6 +773,7 @@ export default function AccessibilityWidgetV2() {
             )}
           </TabPanel>
         </Box>
+        </Box> {/* Close stopPropagation wrapper */}
       </Drawer>
     </>
   );
