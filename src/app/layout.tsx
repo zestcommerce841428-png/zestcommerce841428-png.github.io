@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import CssBaseline from '@mui/material/CssBaseline';
 import Script from 'next/script';
+import { Suspense } from 'react';
 import './globals.css';
 
 import { LanguageProvider } from '@/context/LanguageContext';
@@ -112,7 +113,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <AppRouterCacheProvider>
           <RecaptchaWrapper reCaptchaKey={reCaptchaKey}>
             {providers}
