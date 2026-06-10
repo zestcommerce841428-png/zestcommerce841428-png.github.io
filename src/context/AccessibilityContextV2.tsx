@@ -472,7 +472,7 @@ const defaultState: AccessibilityState = {
   // System
   profiles: [],
   activeProfile: null,
-  widgetPosition: { x: 20, y: window.innerHeight - 100 },
+  widgetPosition: { x: 20, y: 500 }, // Safe default for SSR, will update on client
   panelOpen: false,
 };
 
