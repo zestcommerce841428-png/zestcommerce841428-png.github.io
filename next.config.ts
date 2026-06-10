@@ -27,16 +27,12 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'standalone',
   env: {
     NEXT_PUBLIC_BUILD_VERSION: gitInfo.commitHash,
     NEXT_PUBLIC_BUILD_TIME_AGO: gitInfo.timeAgo,
     NEXT_PUBLIC_BUILD_BRANCH: gitInfo.branch,
   },
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
     ignoreBuildErrors: true,
   },
 };
