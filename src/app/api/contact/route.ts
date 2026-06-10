@@ -3,11 +3,11 @@ import nodemailer from 'nodemailer';
 
 /**
  * POST /api/contact
- * Handle contact form submissions
+ * Handle contact form submissions with ReCAPTCHA verification
  */
 export async function POST(req: Request) {
   try {
-    const { name, email, subject, message } = await req.json();
+    const { name, email, subject, message, recaptchaToken } = await req.json();
 
     // Validation
     if (!name || !email || !subject || !message) {
@@ -15,6 +15,31 @@ export async function POST(req: Request) {
         { error: 'All fields are required' },
         { status: 400 }
       );
+    }
+
+    // Verify reCAPTCHA
+    if (!recaptchaToken) {
+      return NextResponse.json(
+        { error: 'ReCAPTCHA verification failed' },
+        { status: 400 }
+      );
+    }
+
+    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    if (recaptchaSecret) {
+      const recaptchaResponse = await fetch(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`,
+        { method: 'POST' }
+      );
+
+      const recaptchaData = await recaptchaResponse.json();
+
+      if (!recaptchaData.success || recaptchaData.score < 0.5) {
+        return NextResponse.json(
+          { error: 'ReCAPTCHA verification failed. Please try again.' },
+          { status: 400 }
+        );
+      }
     }
 
     // Email validation

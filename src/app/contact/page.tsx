@@ -24,8 +24,10 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export default function ContactPage() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -50,10 +52,20 @@ export default function ContactPage() {
     setSuccess(false);
 
     try {
+      // Execute reCAPTCHA
+      if (!executeRecaptcha) {
+        throw new Error('ReCAPTCHA not loaded');
+      }
+
+      const recaptchaToken = await executeRecaptcha('contact_form');
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+        }),
       });
 
       const data = await response.json();
