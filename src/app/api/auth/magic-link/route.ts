@@ -6,19 +6,29 @@ import admin from 'firebase-admin';
 // Initialize Firebase Admin SDK (optional - only if credentials provided)
 if (!admin.apps.length) {
   try {
-    // Check if environment variables are provided
-    const hasFirebaseCredentials =
-      process.env.FIREBASE_PROJECT_ID &&
-      process.env.FIREBASE_CLIENT_EMAIL &&
-      process.env.FIREBASE_PRIVATE_KEY;
+    // ⚠️ SECURITY WARNING: Using NEXT_PUBLIC_ prefix exposes variables to client-side!
+    // This is INSECURE for private keys. Please use non-prefixed variables in production.
+    
+    // Check both with and without NEXT_PUBLIC_ prefix (for backwards compatibility)
+    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL || process.env.NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY;
+
+    const hasFirebaseCredentials = projectId && clientEmail && privateKey;
 
     if (hasFirebaseCredentials) {
+      // Log security warning if using NEXT_PUBLIC_ variables
+      if (process.env.NEXT_PUBLIC_FIREBASE_PRIVATE_KEY) {
+        console.warn('⚠️ [SECURITY] Firebase private key exposed via NEXT_PUBLIC_ prefix!');
+        console.warn('⚠️ [SECURITY] Please rename to FIREBASE_PRIVATE_KEY (without NEXT_PUBLIC_) in Vercel!');
+      }
+
       const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
         ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
         : {
-            project_id: process.env.FIREBASE_PROJECT_ID,  // snake_case required by Firebase
-            client_email: process.env.FIREBASE_CLIENT_EMAIL,  // snake_case required by Firebase
-            private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            project_id: projectId,  // snake_case required by Firebase
+            client_email: clientEmail,  // snake_case required by Firebase
+            private_key: privateKey?.replace(/\\n/g, '\n'),
           };
 
       admin.initializeApp({
