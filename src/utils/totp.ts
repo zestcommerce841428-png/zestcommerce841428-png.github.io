@@ -1,19 +1,13 @@
 // TOTP (Time-based One-Time Password) utilities for 2FA
-import { authenticator } from 'otplib';
+import { generateSecret, generate, verify } from 'otplib';
 import QRCode from 'qrcode';
-
-// Configure otplib
-authenticator.options = {
-  step: 30, // 30 seconds window
-  window: 1, // Allow 1 step before/after for time sync issues
-};
 
 /**
  * Generate TOTP secret and QR code for user
  */
 export async function generateTOTPSecret(email: string): Promise<{ secret: string; qrCode: string; backupCodes: string[] }> {
   // Generate a random secret
-  const secret = authenticator.generateSecret();
+  const secret = generateSecret();
   
   // Create OTP Auth URL
   const service = 'IndianToolsHub';
@@ -31,9 +25,11 @@ export async function generateTOTPSecret(email: string): Promise<{ secret: strin
 /**
  * Verify TOTP token
  */
-export function verifyTOTP(token: string, secret: string): boolean {
+export async function verifyTOTP(token: string, secret: string): Promise<boolean> {
   try {
-    return authenticator.verify({ token, secret });
+    const result = await verify({ token, secret });
+    // VerifyResult can be { valid: true/false } or boolean
+    return typeof result === 'boolean' ? result : (result.valid || false);
   } catch (error) {
     console.error('TOTP verification error:', error);
     return false;

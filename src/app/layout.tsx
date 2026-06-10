@@ -12,6 +12,7 @@ import CookieConsent from '@/components/CookieConsent';
 import AccessibilityWidget from '@/components/AccessibilityWidget';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 import type { Viewport } from 'next';
 
@@ -111,25 +112,12 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <GoogleAnalytics />
         <AppRouterCacheProvider>
           <RecaptchaWrapper reCaptchaKey={reCaptchaKey}>
             {providers}
           </RecaptchaWrapper>
         </AppRouterCacheProvider>
-
-        {/* Google Tag Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-WJJ5F0H16P"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-WJJ5F0H16P');
-          `}
-        </Script>
       </body>
     </html>
   );

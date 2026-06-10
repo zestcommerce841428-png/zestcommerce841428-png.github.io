@@ -1,5 +1,4 @@
-import { Metadata } from 'next';
-import { generateSEO } from '@/utils/seo';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import {
@@ -33,51 +32,7 @@ import { BLOG_POSTS } from '@/data/blogs';
 import { useLanguage } from '@/context/LanguageContext';
 import Link from 'next/link';
 
-// Generate static metadata for the home page
-export async function generateMetadata(): Promise<Metadata> {
-  const seoData = generateSEO('home');
-  return {
-    title: seoData.title,
-    description: seoData.description,
-    keywords: seoData.keywords,
-    authors: seoData.author ? [{ name: seoData.author }] : undefined,
-    alternates: {
-      canonical: seoData.canonical,
-    },
-    openGraph: {
-      title: seoData.title,
-      description: seoData.description,
-      url: seoData.canonical,
-      siteName: 'IndianToolsHub',
-      images: seoData.ogImage ? [
-        {
-          url: seoData.ogImage,
-          width: 1200,
-          height: 630,
-          alt: seoData.title,
-        }
-      ] : undefined,
-      locale: 'en_IN',
-      type: seoData.ogType as 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: seoData.title,
-      description: seoData.description,
-      images: seoData.ogImage ? [seoData.ogImage] : undefined,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-  };
-}
+// Note: Metadata generation moved to layout.tsx since this is a client component
  
 export default function Home() {
   const { t } = useLanguage();
@@ -205,7 +160,7 @@ export default function Home() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               variant="standard"
-              inputProps={{
+              InputProps={{
                 disableUnderline: true,
                 startAdornment: (
                   <InputAdornment position="start" sx={{ pl: 2, color: 'text.secondary' }}>

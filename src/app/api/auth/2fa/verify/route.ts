@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
 
     // First try TOTP verification
-    const isTOTPValid = verifyTOTP(token, secret);
+    const isTOTPValid = await verifyTOTP(token, secret);
     
     if (isTOTPValid) {
       return NextResponse.json({ success: true, method: 'totp' });
