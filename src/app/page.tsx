@@ -160,18 +160,20 @@ export default function Home() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               variant="standard"
-              InputProps={{
-                disableUnderline: true,
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ pl: 2, color: 'text.secondary' }}>
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                style: {
-                  paddingTop: 1.5,
-                  paddingBottom: 1.5,
-                  fontSize: '1.05rem',
-                  color: 'text.primary',
+              slotProps={{
+                input: {
+                  disableUnderline: true,
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ pl: 2, color: 'text.secondary' }}>
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  style: {
+                    paddingTop: 1.5,
+                    paddingBottom: 1.5,
+                    fontSize: '1.05rem',
+                    color: 'text.primary',
+                  },
                 },
               }}
             />
