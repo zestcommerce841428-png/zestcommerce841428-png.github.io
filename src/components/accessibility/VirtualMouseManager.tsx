@@ -18,11 +18,26 @@ import { useAccessibilityV2 } from '@/context/AccessibilityContextV2';
 
 export default function VirtualMouseManager() {
   const a11y = useAccessibilityV2();
-  const [cursorPos, setCursorPos] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  // Initialize with safe defaults for SSR, update on mount
+  const [cursorPos, setCursorPos] = useState({ x: 400, y: 300 });
   const [isClicking, setIsClicking] = useState(false);
   const [speed, setSpeed] = useState(10); // pixels per keypress
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set actual window dimensions on mount (client-side only)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        setCursorPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+        setIsMounted(true);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const moveCursor = useCallback((dx: number, dy: number, fast: boolean = false) => {
+    if (typeof window === 'undefined') return;
+    
     setCursorPos(prev => {
       const multiplier = fast ? 3 : 1;
       const newX = Math.max(0, Math.min(window.innerWidth - 1, prev.x + dx * speed * multiplier));
