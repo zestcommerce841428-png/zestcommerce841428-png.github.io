@@ -14,6 +14,10 @@ import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
 import AccessibilityWidget from '@/components/AccessibilityWidget';
 import AccessibilityWidgetV2 from '@/components/accessibility/AccessibilityWidgetV2';
+import ReadingGuidesManager from '@/components/accessibility/ReadingGuidesManager';
+import TextToSpeechManager from '@/components/accessibility/TextToSpeechManager';
+import CursorEffectsManager from '@/components/accessibility/CursorEffectsManager';
+import KeyboardShortcutsManager from '@/components/accessibility/KeyboardShortcutsManager';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -63,6 +67,10 @@ export default function RootLayout({
             <CustomThemeProvider>
               <CssBaseline />
               <AccessibilityWidgetV2 />
+              <ReadingGuidesManager />
+              <TextToSpeechManager />
+              <CursorEffectsManager />
+              <KeyboardShortcutsManager />
               <ScrollButtons />
               {children}
               <CookieConsent />

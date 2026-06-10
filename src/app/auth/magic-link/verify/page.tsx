@@ -44,16 +44,33 @@ function VerificationContent() {
           throw new Error(data.error || 'Invalid magic link');
         }
 
-        // Token is valid, now sign in with Firebase
-        // In a real implementation, you'd create a custom token on the backend
-        // For now, we'll show success and redirect to login
-        setStatus('success');
-        setMessage(`Magic link verified for ${data.email}! Redirecting to login...`);
+        // If we got a custom token, sign in with it
+        if (data.customToken) {
+          try {
+            await signInWithCustomToken(auth, data.customToken);
+            
+            setStatus('success');
+            setMessage(`Welcome back! You're now logged in as ${data.email}`);
 
-        // Redirect after 2 seconds
-        setTimeout(() => {
-          router.push('/auth/login?email=' + encodeURIComponent(data.email));
-        }, 2000);
+            // Redirect to home after successful login
+            setTimeout(() => {
+              router.push('/');
+            }, 1500);
+          } catch (authError) {
+            console.error('Firebase auth error:', authError);
+            throw new Error('Failed to complete authentication');
+          }
+        } else if (data.fallback) {
+          // Fallback: redirect to login page
+          setStatus('success');
+          setMessage(`Magic link verified for ${data.email}! Redirecting to login...`);
+
+          setTimeout(() => {
+            router.push('/auth/login?email=' + encodeURIComponent(data.email));
+          }, 2000);
+        } else {
+          throw new Error('Invalid response from server');
+        }
 
       } catch (err: unknown) {
         setStatus('error');

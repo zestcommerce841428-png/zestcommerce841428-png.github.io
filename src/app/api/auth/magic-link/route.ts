@@ -1,6 +1,26 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
+import admin from 'firebase-admin';
+
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  try {
+    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
+      ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
+      : {
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        };
+
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  } catch (error) {
+    console.error('Firebase Admin initialization error:', error);
+  }
+}
 
 // Temporary storage for magic links (use Redis in production)
 const magicLinkStore: { [key: string]: { email: string; expires: number } } = {};
@@ -210,11 +230,40 @@ export async function GET(req: Request) {
     // Delete token (single use)
     delete magicLinkStore[token];
 
-    return NextResponse.json({
-      success: true,
-      email,
-      message: 'Magic link verified successfully',
-    });
+    try {
+      // Get or create user in Firebase
+      let firebaseUser;
+      try {
+        firebaseUser = await admin.auth().getUserByEmail(email);
+      } catch (error) {
+        // User doesn't exist, create them
+        firebaseUser = await admin.auth().createUser({
+          email: email,
+          emailVerified: true, // Magic link implies email is verified
+        });
+      }
+
+      // Create custom token for Firebase authentication
+      const customToken = await admin.auth().createCustomToken(firebaseUser.uid);
+
+      return NextResponse.json({
+        success: true,
+        email,
+        customToken,
+        uid: firebaseUser.uid,
+        message: 'Magic link verified successfully',
+      });
+    } catch (firebaseError) {
+      console.error('Firebase error during magic link verification:', firebaseError);
+      
+      // Fallback: return success without custom token (will redirect to login)
+      return NextResponse.json({
+        success: true,
+        email,
+        message: 'Magic link verified successfully',
+        fallback: true,
+      });
+    }
 
   } catch (error: unknown) {
     console.error('Magic link verification error:', error);
