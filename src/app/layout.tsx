@@ -4,26 +4,16 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import './globals.css';
-import '@/styles/accessibility-v2.css';
+import '@/styles/accessibility-v3.css';
 
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
-import { AccessibilityProviderV2 } from '@/context/AccessibilityContextV2';
+import { AccessibilityProviderV3 } from '@/context/AccessibilityContextV3';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
-import AccessibilityWidgetV2 from '@/components/accessibility/AccessibilityWidgetV2';
-import ReadingGuidesManager from '@/components/accessibility/ReadingGuidesManager';
-import TextToSpeechManager from '@/components/accessibility/TextToSpeechManager';
-import CursorEffectsManager from '@/components/accessibility/CursorEffectsManager';
-import KeyboardShortcutsManager from '@/components/accessibility/KeyboardShortcutsManager';
-import AutoScrollManager from '@/components/accessibility/AutoScrollManager';
-import MagnifierManager from '@/components/accessibility/MagnifierManager';
-import VoiceCommandsManager from '@/components/accessibility/VoiceCommandsManager';
-import NavigationManager from '@/components/accessibility/NavigationManager';
-import ContentEnhancementManager from '@/components/accessibility/ContentEnhancementManager';
-import VirtualMouseManager from '@/components/accessibility/VirtualMouseManager';
-import PDFExportManager from '@/components/accessibility/PDFExportManager';
+import AccessibilityWidgetV3 from '@/components/accessibility/AccessibilityWidgetV3';
+import AccessibilityCSSApplier from '@/components/accessibility/AccessibilityCSSApplier';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -69,35 +59,19 @@ export default function RootLayout({
     <AuthProvider>
       <LanguageProvider>
         <AccessibilityProvider>
-          <AccessibilityProviderV2>
+          <AccessibilityProviderV3>
             <CustomThemeProvider>
               <CssBaseline />
-              {/* Accessibility Widget - Main control panel */}
-              <AccessibilityWidgetV2 />
-              
-              {/* Phase 1-3: Core accessibility managers */}
-              <ReadingGuidesManager />
-              <TextToSpeechManager />
-              <CursorEffectsManager />
-              <KeyboardShortcutsManager />
-              
-              {/* Phase 4-5: Advanced visual tools */}
-              <AutoScrollManager />
-              <MagnifierManager />
-              
-              {/* Phase 6: New feature managers (101 features total) */}
-              <VoiceCommandsManager />
-              <NavigationManager />
-              <ContentEnhancementManager />
-              <VirtualMouseManager />
-              <PDFExportManager />
+              {/* New V3 Accessibility System - 47 Practical Features */}
+              <AccessibilityWidgetV3 />
+              <AccessibilityCSSApplier />
               
               {/* Other components */}
               <ScrollButtons />
               {children}
               <CookieConsent />
             </CustomThemeProvider>
-          </AccessibilityProviderV2>
+          </AccessibilityProviderV3>
         </AccessibilityProvider>
       </LanguageProvider>
     </AuthProvider>
