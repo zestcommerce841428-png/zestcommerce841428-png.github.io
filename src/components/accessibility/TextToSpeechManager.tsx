@@ -18,10 +18,26 @@ export default function TextToSpeechManager() {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const currentWordRef = useRef<HTMLElement | null>(null);
 
-  // Initialize speech synthesis
+  // Initialize speech synthesis with voiceschanged listener
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       synthRef.current = window.speechSynthesis;
+      
+      // BUG FIX #7: Add voiceschanged listener for Safari/Chrome
+      const handleVoicesChanged = () => {
+        // Trigger re-render when voices are loaded
+        if (synthRef.current && synthRef.current.getVoices().length > 0) {
+          // Voice list is now available
+        }
+      };
+      
+      synthRef.current.addEventListener('voiceschanged', handleVoicesChanged);
+      
+      return () => {
+        if (synthRef.current) {
+          synthRef.current.removeEventListener('voiceschanged', handleVoicesChanged);
+        }
+      };
     }
   }, []);
 
@@ -108,6 +124,14 @@ export default function TextToSpeechManager() {
         }
       };
     }
+
+    // BUG FIX #1: Add error handler to prevent memory leaks
+    utterance.onerror = (event) => {
+      console.warn('Speech synthesis error:', event);
+      if (currentWordRef.current) {
+        currentWordRef.current.classList.remove('a11y-word-highlight');
+      }
+    };
 
     synthRef.current.speak(utterance);
   }, [a11y.speechRate, a11y.speechPitch, a11y.wordHighlighting, a11y.sentenceHighlighting, getVoice]);

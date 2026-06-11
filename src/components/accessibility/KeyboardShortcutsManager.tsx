@@ -18,6 +18,20 @@ export default function KeyboardShortcutsManager() {
     (e: KeyboardEvent) => {
       if (!a11y.keyboardShortcuts) return;
 
+      // BUG FIX #10: Don't intercept shortcuts when user is typing in input fields
+      const target = e.target as HTMLElement;
+      const isInputField =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable ||
+        target.closest('[contenteditable="true"]');
+      
+      // Allow Escape key to work in input fields (to close panels)
+      if (isInputField && e.key !== 'Escape') {
+        return;
+      }
+
       // Alt + A: Open Accessibility Panel
       if (e.altKey && e.key.toLowerCase() === 'a') {
         e.preventDefault();

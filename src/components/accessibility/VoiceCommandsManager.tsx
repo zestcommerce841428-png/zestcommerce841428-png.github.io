@@ -57,6 +57,9 @@ export default function VoiceCommandsManager() {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [lastCommand, setLastCommand] = useState<string>('');
+  // BUG FIX #4: Track component mount state to prevent restart loop
+  const isComponentMountedRef = useRef(true);
+  const isFeatureEnabledRef = useRef(false);
 
   const navigateToNextHeading = useCallback(() => {
     const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'));
@@ -241,11 +244,19 @@ export default function VoiceCommandsManager() {
   // Mount detection for SSR safety
   useEffect(() => {
     const timer = setTimeout(() => setIsMounted(true), 0);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      // BUG FIX #4: Mark component as unmounted
+      isComponentMountedRef.current = false;
+    };
   }, []);
 
   useEffect(() => {
+    // BUG FIX #4: Update feature enabled ref
+    isFeatureEnabledRef.current = a11y.voiceCommands;
+    
     if (!isMounted || !a11y.voiceCommands) {
+      isFeatureEnabledRef.current = false;
       if (recognitionRef.current) {
         recognitionRef.current.stop();
         setIsListening(false);
@@ -280,11 +291,14 @@ export default function VoiceCommandsManager() {
       console.log('[Voice Commands] Listening ended');
       setIsListening(false);
       
-      // Restart if still enabled
-      if (a11y.voiceCommands) {
+      // BUG FIX #4: Check component and feature state before restarting
+      if (isComponentMountedRef.current && isFeatureEnabledRef.current) {
         setTimeout(() => {
           try {
-            recognition.start();
+            // Double-check still enabled before restart
+            if (isFeatureEnabledRef.current) {
+              recognition.start();
+            }
           } catch (err) {
             console.error('[Voice Commands] Restart error:', err);
           }
