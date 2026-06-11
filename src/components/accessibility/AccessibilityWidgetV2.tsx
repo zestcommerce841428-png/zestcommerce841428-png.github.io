@@ -190,11 +190,22 @@ export default function AccessibilityWidgetV2() {
         }}
         slotProps={{
           paper: {
+            onClick: (e) => {
+              // CRITICAL FIX: Stop all click propagation from drawer content
+              e.stopPropagation();
+            },
             sx: {
               width: { xs: '100%', sm: 480 },
               maxWidth: '100vw',
             },
           },
+          backdrop: {
+            onClick: () => setOpen(false), // Explicit backdrop handler
+          },
+        }}
+        ModalProps={{
+          keepMounted: false, // Better performance
+          disableScrollLock: false,
         }}
       >
         {/* Header */}
