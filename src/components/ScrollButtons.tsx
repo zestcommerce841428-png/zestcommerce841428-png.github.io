@@ -55,15 +55,15 @@ export default function ScrollButtons() {
       sx={{
         position: 'fixed',
         bottom: 24,
-        right: 24,
-        zIndex: 1000,
+        left: 24,
+        zIndex: 999997,
         display: 'flex',
         flexDirection: 'column',
         gap: 1.5,
       }}
     >
       <Zoom in={showTopBtn}>
-        <Tooltip title="Scroll to Top" placement="left">
+        <Tooltip title="Scroll to Top" placement="right">
           <Fab
             onClick={scrollToTop}
             size="medium"
@@ -87,7 +87,7 @@ export default function ScrollButtons() {
       </Zoom>
 
       <Zoom in={showBottomBtn}>
-        <Tooltip title="Scroll to Bottom" placement="left">
+        <Tooltip title="Scroll to Bottom" placement="right">
           <Fab
             onClick={scrollToBottom}
             size="medium"
