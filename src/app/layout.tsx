@@ -12,6 +12,7 @@ import { AccessibilityProviderV3 } from '@/context/AccessibilityContextV3';
 import { AccessibilityProviderV4 } from '@/context/AccessibilityContextV4';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { FavoritesProvider } from '@/context/FavoritesContext';
 import CookieConsent from '@/components/CookieConsent';
 import AccessibilityPanelV4 from '@/components/accessibility/AccessibilityPanelV4';
 import AccessibilityCSSApplierV4 from '@/components/accessibility/AccessibilityCSSApplierV4';
@@ -58,25 +59,27 @@ export default function RootLayout({
 
   const providers = (
     <AuthProvider>
-      <LanguageProvider>
-        <AccessibilityProvider>
-          <AccessibilityProviderV3>
-            <AccessibilityProviderV4>
-              <CustomThemeProvider>
-                <CssBaseline />
-                {/* New V4 Accessibility System - 49 Advanced Features */}
-                <AccessibilityPanelV4 />
-                <AccessibilityCSSApplierV4 />
-                
-                {/* Other components */}
-                <ScrollButtons />
-                {children}
-                <CookieConsent />
-              </CustomThemeProvider>
-            </AccessibilityProviderV4>
-          </AccessibilityProviderV3>
-        </AccessibilityProvider>
-      </LanguageProvider>
+      <FavoritesProvider>
+        <LanguageProvider>
+          <AccessibilityProvider>
+            <AccessibilityProviderV3>
+              <AccessibilityProviderV4>
+                <CustomThemeProvider>
+                  <CssBaseline />
+                  {/* New V4 Accessibility System - 49 Advanced Features */}
+                  <AccessibilityPanelV4 />
+                  <AccessibilityCSSApplierV4 />
+                  
+                  {/* Other components */}
+                  <ScrollButtons />
+                  {children}
+                  <CookieConsent />
+                </CustomThemeProvider>
+              </AccessibilityProviderV4>
+            </AccessibilityProviderV3>
+          </AccessibilityProvider>
+        </LanguageProvider>
+      </FavoritesProvider>
     </AuthProvider>
   );
 

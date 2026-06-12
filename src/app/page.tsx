@@ -17,19 +17,23 @@ import {
   Paper,
   Pagination,
   Divider,
+  Badge,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import SearchIcon from '@mui/icons-material/Search';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useTheme } from '@mui/material/styles';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ToolIcon from '@/components/ToolIcon';
 import WelcomeModal from '@/components/WelcomeModal';
+import FavoriteButton from '@/components/FavoriteButton';
 import { TOOLS, CATEGORIES } from '@/data/tools';
 import { BLOG_POSTS } from '@/data/blogs';
 import { useLanguage } from '@/context/LanguageContext';
+import { useFavorites } from '@/context/FavoritesContext';
 import Link from 'next/link';
 
 // Note: Metadata generation moved to layout.tsx since this is a client component
@@ -37,6 +41,7 @@ import Link from 'next/link';
 export default function Home() {
   const { t } = useLanguage();
   const theme = useTheme();
+  const { favorites } = useFavorites();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [blogPage, setBlogPage] = useState(1);
@@ -64,16 +69,25 @@ export default function Home() {
   // Filter tools based on tab and search query
   const filteredTools = useMemo(() => {
     return TOOLS.filter((tool) => {
-      const matchesTab = activeTab === 'all' || tool.category === activeTab;
+      // Handle favorites tab
+      if (activeTab === 'favorites') {
+        const matchesFavorites = favorites.includes(tool.slug);
+        if (!matchesFavorites) return false;
+      } else {
+        const matchesTab = activeTab === 'all' || tool.category === activeTab;
+        if (!matchesTab) return false;
+      }
+      
       const cleanQuery = searchQuery.toLowerCase().trim();
       const matchesSearch =
+        !cleanQuery ||
         tool.title.toLowerCase().includes(cleanQuery) ||
         tool.description.toLowerCase().includes(cleanQuery) ||
         tool.keywords.some((kw) => kw.toLowerCase().includes(cleanQuery));
 
-      return matchesTab && matchesSearch;
+      return matchesSearch;
     });
-  }, [activeTab, searchQuery]);
+  }, [activeTab, searchQuery, favorites]);
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
@@ -206,6 +220,22 @@ export default function Home() {
             }}
           >
             <Tab value="all" label={t('allUtilities')} />
+            <Tab
+              value="favorites"
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FavoriteIcon sx={{ fontSize: 18 }} />
+                  Favorites
+                  {favorites.length > 0 && (
+                    <Badge
+                      badgeContent={favorites.length}
+                      color="error"
+                      sx={{ ml: 0.5 }}
+                    />
+                  )}
+                </Box>
+              }
+            />
             {CATEGORIES.map((cat) => (
               <Tab
                 key={cat.id}
@@ -245,7 +275,10 @@ export default function Home() {
           <Grid container spacing={3}>
             {filteredTools.map((tool) => (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.slug}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                  <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
+                    <FavoriteButton toolSlug={tool.slug} />
+                  </Box>
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     <Box
                       sx={{
