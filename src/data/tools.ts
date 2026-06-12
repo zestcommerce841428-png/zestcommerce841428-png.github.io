@@ -1095,5 +1095,14 @@ export const TOOLS: Tool[] = [
     legacyFilename: '',
     keywords: ['hash', 'md5', 'sha', 'sha256', 'sha512', 'checksum', 'crypto', 'hash generator', 'file hash', 'verify hash'],
   },
+  {
+    slug: 'cron-expression-generator',
+    title: 'Cron Expression Generator',
+    description: 'Build and test cron expressions with a visual interface. Generate schedules for automated tasks with presets and custom fields.',
+    category: 'developer',
+    icon: 'Schedule',
+    legacyFilename: '',
+    keywords: ['cron', 'schedule', 'cron expression', 'task scheduler', 'automation', 'cron builder', 'cron generator', 'periodic task'],
+  },
 ];
 
