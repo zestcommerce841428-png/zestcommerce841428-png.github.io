@@ -1040,5 +1040,33 @@ export const TOOLS: Tool[] = [
     legacyFilename: 'double_sha256.html',
     keywords: ['double sha256', 'sha256', 'cryptography', 'hash'],
   },
+  // NEW PROFESSIONAL TOOLS - 2026
+  {
+    slug: 'transcript-pro',
+    title: 'TranscriptPro - YouTube Transcript Extractor',
+    description: 'Extract, download, and search YouTube video transcripts with timestamps in multiple formats.',
+    category: 'utility',
+    icon: 'Subtitles',
+    legacyFilename: '',
+    keywords: ['youtube', 'transcript', 'subtitles', 'captions', 'video text', 'download transcript', 'timestamped'],
+  },
+  {
+    slug: 'author-pro',
+    title: 'AuthorPro - Professional Manuscript Formatter',
+    description: 'Format manuscripts with TipTap editor, book structure, and export to PDF/EPUB for publishing.',
+    category: 'document',
+    icon: 'MenuBook',
+    legacyFilename: '',
+    keywords: ['manuscript', 'book', 'author', 'pdf', 'epub', 'publish', 'editor', 'chapters', 'writing'],
+  },
+  {
+    slug: 'file-flux',
+    title: 'FileFlux - 8-in-1 Multi-Format Converter',
+    description: 'Convert PNG↔JPG, Image↔PDF, compress/resize images, and text↔image conversion all in one tool.',
+    category: 'image',
+    icon: 'Transform',
+    legacyFilename: '',
+    keywords: ['file converter', 'image converter', 'pdf converter', 'compress', 'resize', 'png to jpg', 'ocr'],
+  },
 ];
 
