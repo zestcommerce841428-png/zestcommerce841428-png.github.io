@@ -1068,5 +1068,14 @@ export const TOOLS: Tool[] = [
     legacyFilename: '',
     keywords: ['file converter', 'image converter', 'pdf converter', 'compress', 'resize', 'png to jpg', 'ocr'],
   },
+  {
+    slug: 'password-strength-tester',
+    title: 'Password Strength Tester',
+    description: 'Test password strength with real-time analysis, generate secure passwords, and get security tips instantly.',
+    category: 'utility',
+    icon: 'Security',
+    legacyFilename: '',
+    keywords: ['password', 'security', 'strength', 'generator', 'checker', 'password test', 'strong password', 'password generator'],
+  },
 ];
 
