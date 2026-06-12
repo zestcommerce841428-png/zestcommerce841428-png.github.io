@@ -444,7 +444,7 @@ export default function AccessibilityPanelV4() {
         sx={{
           position: 'fixed',
           bottom: 24,
-          right: 24,
+          left: 24,
           zIndex: 999998,
         }}
       >
@@ -455,7 +455,7 @@ export default function AccessibilityPanelV4() {
 
       {/* Accessibility Panel Drawer */}
       <Drawer
-        anchor="right"
+        anchor="left"
         open={open}
         onClose={() => setOpen(false)}
         slotProps={{
