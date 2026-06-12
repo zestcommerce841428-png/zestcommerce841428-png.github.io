@@ -1077,5 +1077,14 @@ export const TOOLS: Tool[] = [
     legacyFilename: '',
     keywords: ['password', 'security', 'strength', 'generator', 'checker', 'password test', 'strong password', 'password generator'],
   },
+  {
+    slug: 'regex-tester',
+    title: 'Regex Tester & Visualizer',
+    description: 'Test regular expressions in real-time with match highlighting, replacement preview, and common pattern shortcuts.',
+    category: 'developer',
+    icon: 'Code',
+    legacyFilename: '',
+    keywords: ['regex', 'regular expression', 'pattern', 'match', 'test', 'visualizer', 'regexp', 'regex tester', 'regex builder'],
+  },
 ];
 
