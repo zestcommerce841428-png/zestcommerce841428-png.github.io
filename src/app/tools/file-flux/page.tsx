@@ -38,6 +38,9 @@ import {
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 type ConverterType =
   | 'png-to-jpg'
@@ -429,7 +432,9 @@ export default function FileFluxPage() {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <ProtectedRoute>
+      <Header />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
         <Transform sx={{ fontSize: 48, color: 'primary.main' }} />
@@ -751,6 +756,8 @@ export default function FileFluxPage() {
           </Card>
         </Box>
       </Box>
-    </Container>
+      </Container>
+      <Footer />
+    </ProtectedRoute>
   );
 }

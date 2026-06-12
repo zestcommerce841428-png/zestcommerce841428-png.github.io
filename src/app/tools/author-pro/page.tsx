@@ -47,6 +47,9 @@ import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { Link } from '@tiptap/extension-link';
 import jsPDF from 'jspdf';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Book structure types
 type FrontMatterType = 'dedication' | 'epigraph' | 'foreword' | 'preface' | 'acknowledgements';
@@ -472,7 +475,9 @@ export default function AuthorProPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <ProtectedRoute>
+      <Header />
+      <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -1020,6 +1025,8 @@ export default function AuthorProPage() {
           <Button onClick={() => setPreviewDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
-    </Container>
+      </Container>
+      <Footer />
+    </ProtectedRoute>
   );
 }

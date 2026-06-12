@@ -29,6 +29,9 @@ import {
   AccessTime,
   TextFields,
 } from '@mui/icons-material';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface TranscriptSegment {
   text: string;
@@ -144,7 +147,9 @@ export default function TranscriptProPage() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <ProtectedRoute>
+      <Header />
+      <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
@@ -351,6 +356,8 @@ export default function TranscriptProPage() {
         onClose={() => setToast({ ...toast, open: false })}
         message={toast.message}
       />
-    </Container>
+      </Container>
+      <Footer />
+    </ProtectedRoute>
   );
 }
