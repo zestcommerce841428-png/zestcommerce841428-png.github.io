@@ -1104,5 +1104,32 @@ export const TOOLS: Tool[] = [
     legacyFilename: '',
     keywords: ['cron', 'schedule', 'cron expression', 'task scheduler', 'automation', 'cron builder', 'cron generator', 'periodic task'],
   },
+  {
+    slug: 'base64-encoder-decoder',
+    title: 'Base64 Encoder / Decoder',
+    description: 'Encode and decode text or files to/from Base64 format. Support for file upload and download with data URLs.',
+    category: 'utility',
+    icon: 'LockOpen',
+    legacyFilename: '',
+    keywords: ['base64', 'encode', 'decode', 'encoder', 'decoder', 'base64 converter', 'data url', 'base64 file'],
+  },
+  {
+    slug: 'uuid-generator',
+    title: 'UUID Generator',
+    description: 'Generate universally unique identifiers (UUIDs) in various formats. Support for UUID v1 and v4 with bulk generation.',
+    category: 'developer',
+    icon: 'Fingerprint',
+    legacyFilename: '',
+    keywords: ['uuid', 'guid', 'unique id', 'uuid generator', 'uuid v4', 'uuid v1', 'identifier', 'random id'],
+  },
+  {
+    slug: 'url-encoder-decoder',
+    title: 'URL Encoder / Decoder',
+    description: 'Encode and decode URLs and URL parameters with component and full URL encoding. Parse URL into components.',
+    category: 'utility',
+    icon: 'Link',
+    legacyFilename: '',
+    keywords: ['url', 'encode', 'decode', 'url encoder', 'percent encoding', 'query string', 'url parser', 'uri'],
+  },
 ];
 
