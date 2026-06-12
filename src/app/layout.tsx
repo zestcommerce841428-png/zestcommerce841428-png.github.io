@@ -12,7 +12,7 @@ import { AccessibilityProviderV3 } from '@/context/AccessibilityContextV3';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
-import AccessibilityWidgetV3 from '@/components/accessibility/AccessibilityWidgetV3';
+import AccessibilityFooterBar from '@/components/accessibility/AccessibilityFooterBar';
 import AccessibilityCSSApplier from '@/components/accessibility/AccessibilityCSSApplier';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
@@ -62,8 +62,8 @@ export default function RootLayout({
           <AccessibilityProviderV3>
             <CustomThemeProvider>
               <CssBaseline />
-              {/* New V3 Accessibility System - 47 Practical Features */}
-              <AccessibilityWidgetV3 />
+              {/* New V3 Accessibility System - 47 Practical Features (Footer Bar) */}
+              <AccessibilityFooterBar />
               <AccessibilityCSSApplier />
               
               {/* Other components */}
