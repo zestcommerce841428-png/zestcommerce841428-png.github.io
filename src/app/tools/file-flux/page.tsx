@@ -38,6 +38,7 @@ import {
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
+import Tesseract from 'tesseract.js';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -394,7 +395,55 @@ export default function FileFluxPage() {
         }
 
         case 'image-to-text': {
-          setResult('OCR functionality requires Tesseract.js library integration. This would extract text from images in supported languages.');
+          // Real OCR implementation using Tesseract.js
+          if (files.length === 0) {
+            setResult('Please select at least one image file for OCR.');
+            break;
+          }
+
+          setProgress(10);
+          const extractedTexts: string[] = [];
+
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            setProgress(10 + (i * 80 / files.length));
+
+            try {
+              // Perform OCR on the image
+              const result = await Tesseract.recognize(
+                file,
+                settings.ocrLanguage || 'eng',
+                {
+                  logger: (m) => {
+                    if (m.status === 'recognizing text') {
+                      const fileProgress = 10 + (i * 80 / files.length);
+                      const currentProgress = fileProgress + (m.progress * 80 / files.length);
+                      setProgress(Math.round(currentProgress));
+                    }
+                  }
+                }
+              );
+
+              const text = result.data.text;
+              extractedTexts.push(`=== File: ${file.name} ===\n${text}\n`);
+            } catch (error) {
+              extractedTexts.push(`=== File: ${file.name} ===\nError: ${error instanceof Error ? error.message : 'OCR failed'}\n`);
+            }
+          }
+
+          // Combine all extracted texts
+          const combinedText = extractedTexts.join('\n');
+
+          // Create downloadable text file
+          const blob = new Blob([combinedText], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ocr-extracted-text-${Date.now()}.txt`;
+          a.click();
+          URL.revokeObjectURL(url);
+
+          setResult(`Successfully extracted text from ${files.length} image(s). Download started.`);
           break;
         }
 

@@ -55,22 +55,44 @@ export async function POST(req: NextRequest) {
     
     // Handle specific errors
     const errorMessage = error instanceof Error ? error.message : String(error);
-    if (errorMessage.includes('Could not find captions')) {
+    
+    if (errorMessage.includes('Could not find captions') || errorMessage.includes('Transcript is disabled')) {
       return NextResponse.json(
-        { error: 'No captions/subtitles available for this video' },
+        { error: 'No captions/subtitles available for this video. The video may not have auto-generated or manual captions enabled.' },
         { status: 404 }
       );
     }
 
-    if (errorMessage.includes('unavailable')) {
+    if (errorMessage.includes('unavailable') || errorMessage.includes('not available')) {
       return NextResponse.json(
-        { error: 'Video is unavailable or private' },
+        { error: 'Video is unavailable, private, or deleted' },
         { status: 403 }
       );
     }
 
+    if (errorMessage.includes('Too Many Requests') || errorMessage.includes('429')) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded. Please try again in a few moments.' },
+        { status: 429 }
+      );
+    }
+
+    if (errorMessage.includes('blocked') || errorMessage.includes('restricted')) {
+      return NextResponse.json(
+        { error: 'Access to this video is restricted. Try another video.' },
+        { status: 403 }
+      );
+    }
+
+    // Log the full error for debugging
+    console.error('Full error details:', {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      videoId: 'N/A'
+    });
+
     return NextResponse.json(
-      { error: 'Failed to extract transcript. Please try again.' },
+      { error: `Failed to extract transcript: ${errorMessage}` },
       { status: 500 }
     );
   }
