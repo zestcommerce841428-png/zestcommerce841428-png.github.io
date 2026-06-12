@@ -9,11 +9,12 @@ import '@/styles/accessibility-v3.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { AccessibilityProvider } from '@/context/AccessibilityContext';
 import { AccessibilityProviderV3 } from '@/context/AccessibilityContextV3';
+import { AccessibilityProviderV4 } from '@/context/AccessibilityContextV4';
 import { CustomThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import CookieConsent from '@/components/CookieConsent';
-import AccessibilityFooterBar from '@/components/accessibility/AccessibilityFooterBar';
-import AccessibilityCSSApplier from '@/components/accessibility/AccessibilityCSSApplier';
+import AccessibilityPanelV4 from '@/components/accessibility/AccessibilityPanelV4';
+import AccessibilityCSSApplierV4 from '@/components/accessibility/AccessibilityCSSApplierV4';
 import ScrollButtons from '@/components/ScrollButtons';
 import RecaptchaWrapper from '@/components/RecaptchaWrapper';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -60,17 +61,19 @@ export default function RootLayout({
       <LanguageProvider>
         <AccessibilityProvider>
           <AccessibilityProviderV3>
-            <CustomThemeProvider>
-              <CssBaseline />
-              {/* New V3 Accessibility System - 47 Practical Features (Footer Bar) */}
-              <AccessibilityFooterBar />
-              <AccessibilityCSSApplier />
-              
-              {/* Other components */}
-              <ScrollButtons />
-              {children}
-              <CookieConsent />
-            </CustomThemeProvider>
+            <AccessibilityProviderV4>
+              <CustomThemeProvider>
+                <CssBaseline />
+                {/* New V4 Accessibility System - 49 Advanced Features */}
+                <AccessibilityPanelV4 />
+                <AccessibilityCSSApplierV4 />
+                
+                {/* Other components */}
+                <ScrollButtons />
+                {children}
+                <CookieConsent />
+              </CustomThemeProvider>
+            </AccessibilityProviderV4>
           </AccessibilityProviderV3>
         </AccessibilityProvider>
       </LanguageProvider>
