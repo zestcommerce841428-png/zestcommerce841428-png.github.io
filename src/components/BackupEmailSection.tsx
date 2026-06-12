@@ -3,10 +3,13 @@
 import React, { useState } from 'react';
 import {
   Paper, Box, Typography, TextField, Button, CircularProgress, Alert,
-  Dialog, DialogTitle, DialogContent, DialogActions, Chip
+  Dialog, DialogTitle, DialogContent, DialogActions, Chip, IconButton
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { db, auth } from '@/config/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
 
 interface BackupEmailSectionProps {
   currentBackupEmail?: string;
@@ -79,9 +82,9 @@ export default function BackupEmailSection({
       const response = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: backupEmail, 
-          otp 
+        body: JSON.stringify({
+          email: backupEmail,
+          otp
         })
       });
 
@@ -91,13 +94,16 @@ export default function BackupEmailSection({
         throw new Error(data.error || 'Invalid OTP');
       }
 
-      // Save to Firestore (you'll need to import and use your db)
-      // await updateDoc(doc(db, 'users', userId), { 
-      //   backupEmail, 
-      //   backupEmailVerified: true 
-      // });
+      // Save to Firestore
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          backupEmail,
+          backupEmailVerified: true
+        });
+      }
 
-      setSuccess('Backup email verified successfully!');
+      setSuccess('Backup email verified and saved successfully!');
       setShowOtpDialog(false);
       setIsEditing(false);
       setOtp('');
@@ -107,6 +113,34 @@ export default function BackupEmailSection({
       setError(err instanceof Error ? err.message : 'Verification failed');
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const handleDeleteBackupEmail = async () => {
+    if (!confirm('Are you sure you want to remove your backup email?')) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          backupEmail: null,
+          backupEmailVerified: false
+        });
+        
+        setBackupEmail('');
+        setSuccess('Backup email removed successfully!');
+        
+        if (onSuccess) onSuccess();
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove backup email');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,16 +183,28 @@ export default function BackupEmailSection({
           />
           
           {!isEditing && isVerified ? (
-            <Button 
-              variant="outlined" 
-              onClick={() => setIsEditing(true)}
-              sx={{ minWidth: 120, height: 56 }}
-            >
-              Change
-            </Button>
+            <>
+              <Button
+                variant="outlined"
+                onClick={() => setIsEditing(true)}
+                sx={{ minWidth: 120, height: 56 }}
+                disabled={loading}
+              >
+                Change
+              </Button>
+              <IconButton
+                color="error"
+                onClick={handleDeleteBackupEmail}
+                disabled={loading}
+                sx={{ height: 56, width: 56 }}
+                title="Remove backup email"
+              >
+                {loading ? <CircularProgress size={24} /> : <DeleteIcon />}
+              </IconButton>
+            </>
           ) : (
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               onClick={handleSendOtp}
               disabled={loading || !backupEmail}
               sx={{ minWidth: 120, height: 56 }}
