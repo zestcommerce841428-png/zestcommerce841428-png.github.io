@@ -13,6 +13,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Match {
   match: string;
@@ -129,9 +130,10 @@ export default function RegexTester() {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <CodeIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -370,8 +372,9 @@ export default function RegexTester() {
             </Box>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }

@@ -15,6 +15,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import SecurityIcon from '@mui/icons-material/Security';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface PasswordStrength {
   score: number; // 0-100
@@ -155,9 +156,10 @@ export default function PasswordStrengthTester() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="md" sx={{ py: 4, flexGrow: 1 }}>
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="md" sx={{ py: 4, flexGrow: 1 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <SecurityIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -386,8 +388,9 @@ export default function PasswordStrengthTester() {
             </Typography>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }

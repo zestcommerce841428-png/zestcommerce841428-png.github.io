@@ -10,6 +10,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function URLEncoderDecoder() {
   const [input, setInput] = useState('');
@@ -92,9 +93,10 @@ export default function URLEncoderDecoder() {
   const parsedURL = input ? parseURL(input) : null;
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <LinkIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -381,8 +383,9 @@ export default function URLEncoderDecoder() {
             </Box>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }

@@ -12,6 +12,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface CronField {
   minute: string;
@@ -187,10 +188,11 @@ export default function CronExpressionGenerator() {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
-        {/* Header */}
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+          {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <ScheduleIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
           <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 1 }}>
@@ -460,8 +462,9 @@ export default function CronExpressionGenerator() {
             </Box>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }

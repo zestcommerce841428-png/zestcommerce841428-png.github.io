@@ -14,6 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 type UUIDVersion = 'v4' | 'v1';
 
@@ -101,9 +102,10 @@ export default function UUIDGenerator() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <FingerprintIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -390,8 +392,9 @@ export default function UUIDGenerator() {
             </Box>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }

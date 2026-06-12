@@ -12,6 +12,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DownloadIcon from '@mui/icons-material/Download';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export default function Base64Tool() {
   const [tabValue, setTabValue] = useState(0);
@@ -107,9 +108,10 @@ export default function Base64Tool() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header />
-      <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
+    <ProtectedRoute>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <Header />
+        <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
           <LockOpenIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
@@ -332,8 +334,9 @@ export default function Base64Tool() {
             </Typography>
           </CardContent>
         </Card>
-      </Container>
-      <Footer />
-    </Box>
+        </Container>
+        <Footer />
+      </Box>
+    </ProtectedRoute>
   );
 }
