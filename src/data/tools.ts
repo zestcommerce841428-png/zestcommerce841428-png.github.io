@@ -1086,5 +1086,14 @@ export const TOOLS: Tool[] = [
     legacyFilename: '',
     keywords: ['regex', 'regular expression', 'pattern', 'match', 'test', 'visualizer', 'regexp', 'regex tester', 'regex builder'],
   },
+  {
+    slug: 'hash-generator',
+    title: 'Hash Generator & Verifier',
+    description: 'Generate cryptographic hashes for text and files with MD5, SHA-1, SHA-256, SHA-384, and SHA-512 algorithms.',
+    category: 'developer',
+    icon: 'Lock',
+    legacyFilename: '',
+    keywords: ['hash', 'md5', 'sha', 'sha256', 'sha512', 'checksum', 'crypto', 'hash generator', 'file hash', 'verify hash'],
+  },
 ];
 
